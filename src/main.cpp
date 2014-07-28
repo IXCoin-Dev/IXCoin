@@ -1108,9 +1108,9 @@ bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos)
 void CBlockHeader::SetAuxPow(CAuxPow* pow)
 {
     if (pow != NULL)
-		nVersion |=  BLOCK_VERSION_AUXPOW;
+		nVersion |=  CAuxPow::BLOCK_VERSION_AUXPOW;
     else
-        nVersion &=  ~BLOCK_VERSION_AUXPOW;
+        nVersion &=  ~CAuxPow::BLOCK_VERSION_AUXPOW;
     auxpow.reset(pow);
 }
 
@@ -2643,7 +2643,7 @@ bool ProcessBlock(CValidationState &state, CNode* pfrom, CBlock* pblock, CDiskBl
 
 bool CDiskBlockIndex::CheckIndex() const
 {
-    if (nVersion & BLOCK_VERSION_AUXPOW)
+    if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW)
         return CheckProofOfWork(auxpow->GetParentBlockHash(), nBits);
     else
         return CheckProofOfWork(GetBlockHash(), nBits);
@@ -2652,7 +2652,7 @@ CBlockHeader CBlockIndex::GetBlockHeader() const
 {
     CBlockHeader block;
   
-    if (nVersion & BLOCK_VERSION_AUXPOW) {
+    if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW) {
         CDiskBlockIndex diskblockindex;
         // auxpow is not in memory, load CDiskBlockHeader
         // from database to get it
