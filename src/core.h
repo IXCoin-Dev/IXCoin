@@ -345,7 +345,7 @@ class CBlockHeader
 {
 public:
     // header
-    static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
+	static const int CURRENT_VERSION=CAuxPow::BLOCK_VERSION_DEFAULT;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
@@ -369,12 +369,12 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
 
-		nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
+		nSerSize += CAuxPow::ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
     )
 	void SetAuxPow(CAuxPow* pow);
     void SetNull()
     {
-        nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
+		nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * CAuxPow::BLOCK_VERSION_CHAIN_START);
         hashPrevBlock = 0;
         hashMerkleRoot = 0;
         nTime = 0;
@@ -383,7 +383,7 @@ public:
     }
     int GetChainID() const
     {
-        return nVersion / BLOCK_VERSION_CHAIN_START;
+        return nVersion / CAuxPow::BLOCK_VERSION_CHAIN_START;
     }
     bool IsNull() const
     {

@@ -35,26 +35,6 @@ class CBloomFilter;
 class CInv;
 class CAuxPow;
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
-enum
-{
-    // primary version
-    BLOCK_VERSION_DEFAULT        = (1 << 0),
-
-    // modifiers
-    BLOCK_VERSION_AUXPOW         = (1 << 8),
-
-    // bits allocated for chain ID
-    BLOCK_VERSION_CHAIN_START    = (1 << 16),
-    BLOCK_VERSION_CHAIN_END      = (1 << 30),
-};
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
@@ -915,7 +895,7 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-		ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
+		CAuxPow::ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
     )
 
     uint256 GetBlockHash() const
