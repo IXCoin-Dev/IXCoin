@@ -42,29 +42,13 @@ public:
     {
         return parentBlockHeader.GetHash();
     }
-	enum
-	{
-		// primary version
-		BLOCK_VERSION_DEFAULT        = (1 << 0),
-
-		// modifiers
-		BLOCK_VERSION_AUXPOW         = (1 << 8),
-
-		// bits allocated for chain ID
-		BLOCK_VERSION_CHAIN_START    = (1 << 16),
-		BLOCK_VERSION_CHAIN_END      = (1 << 30),
-	};
-	static int GetOurChainID()
-	{
-		return 0x0004;
-	}
 };
 
 
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
 {
-	if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
+	if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
     {
         return ::GetSerializeSize(*auxpow, nType, nVersion);
     }
@@ -74,7 +58,7 @@ int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nTy
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action)
 {
-    if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
+    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
     {
         return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
     }
@@ -84,7 +68,7 @@ int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nTy
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action)
 {
-    if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW)
+    if (nVersion & BLOCK_VERSION_AUXPOW)
     {
 		CAuxPow* newPow = new CAuxPow();
         auxpow.reset(newPow);

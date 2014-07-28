@@ -1108,12 +1108,15 @@ bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos)
 void CBlockHeader::SetAuxPow(CAuxPow* pow)
 {
     if (pow != NULL)
-		nVersion |=  CAuxPow::BLOCK_VERSION_AUXPOW;
+		nVersion |=  BLOCK_VERSION_AUXPOW;
     else
-        nVersion &=  ~CAuxPow::BLOCK_VERSION_AUXPOW;
+        nVersion &=  ~BLOCK_VERSION_AUXPOW;
     auxpow.reset(pow);
 }
-
+int GetOurChainID()
+	{
+		return 0x0004;
+	}
 bool CBlockHeader::CheckProofOfWork(int nHeight) const
 {
     if (nHeight >= GetAuxPowStartBlock())
@@ -1122,7 +1125,7 @@ bool CBlockHeader::CheckProofOfWork(int nHeight) const
         // - this block must have our chain ID
         // - parent block must not have the same chain ID (see CAuxPow::Check)
         // - index of this chain in chain merkle tree must be pre-determined (see CAuxPow::Check)
-        if (!TestNet() && nHeight != INT_MAX && GetChainID() != CAuxPow::GetOurChainID())
+        if (!TestNet() && nHeight != INT_MAX && GetChainID() != GetOurChainID())
             return error("CheckProofOfWork() : block does not have our chain ID");
 
         if (auxpow.get() != NULL)
@@ -2643,7 +2646,7 @@ bool ProcessBlock(CValidationState &state, CNode* pfrom, CBlock* pblock, CDiskBl
 
 bool CDiskBlockIndex::CheckIndex() const
 {
-    if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW)
+    if (nVersion & BLOCK_VERSION_AUXPOW)
         return CheckProofOfWork(auxpow->GetParentBlockHash(), nBits);
     else
         return CheckProofOfWork(GetBlockHash(), nBits);
@@ -2652,7 +2655,7 @@ CBlockHeader CBlockIndex::GetBlockHeader() const
 {
     CBlockHeader block;
   
-    if (nVersion & CAuxPow::BLOCK_VERSION_AUXPOW) {
+    if (nVersion & BLOCK_VERSION_AUXPOW) {
         CDiskBlockIndex diskblockindex;
         // auxpow is not in memory, load CDiskBlockHeader
         // from database to get it

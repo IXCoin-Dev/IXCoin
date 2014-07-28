@@ -41,7 +41,18 @@ int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, in
 
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
+enum
+{
+	// primary version
+	BLOCK_VERSION_DEFAULT        = (1 << 0),
 
+	// modifiers
+	BLOCK_VERSION_AUXPOW         = (1 << 8),
+
+	// bits allocated for chain ID
+	BLOCK_VERSION_CHAIN_START    = (1 << 16),
+	BLOCK_VERSION_CHAIN_END      = (1 << 30),
+};
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
 /** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/

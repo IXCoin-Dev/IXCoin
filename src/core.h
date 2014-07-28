@@ -13,7 +13,26 @@
 #include <stdint.h>
 
 class CTransaction;
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
 
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
+enum
+{
+	// primary version
+	BLOCK_VERSION_DEFAULT        = (1 << 0),
+
+	// modifiers
+	BLOCK_VERSION_AUXPOW         = (1 << 8),
+
+	// bits allocated for chain ID
+	BLOCK_VERSION_CHAIN_START    = (1 << 16),
+	BLOCK_VERSION_CHAIN_END      = (1 << 30),
+};
 /** No amount larger than this (in satoshi) is valid */
 static const int64_t MAX_MONEY = (int64_t)21000000 * COIN * (int64_t)1000 * COIN;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
@@ -345,7 +364,7 @@ class CBlockHeader
 {
 public:
     // header
-	static const int CURRENT_VERSION=CAuxPow::BLOCK_VERSION_DEFAULT;
+	static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
@@ -374,7 +393,7 @@ public:
 	void SetAuxPow(CAuxPow* pow);
     void SetNull()
     {
-		nVersion = CBlockHeader::CURRENT_VERSION | (CAuxPow::GetOurChainID() * CAuxPow::BLOCK_VERSION_CHAIN_START);
+		nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
         hashPrevBlock = 0;
         hashMerkleRoot = 0;
         nTime = 0;
@@ -383,7 +402,7 @@ public:
     }
     int GetChainID() const
     {
-        return nVersion / CAuxPow::BLOCK_VERSION_CHAIN_START;
+        return nVersion / BLOCK_VERSION_CHAIN_START;
     }
     bool IsNull() const
     {
