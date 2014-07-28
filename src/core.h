@@ -5,13 +5,13 @@
 
 #ifndef BITCOIN_CORE_H
 #define BITCOIN_CORE_H
-#include "auxpow.h"
+
 #include "main.h"
 #include "script.h"
 #include "serialize.h"
 #include "uint256.h"
 #include <stdint.h>
-
+#include "auxpow.h"
 class CTransaction;
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
@@ -23,7 +23,7 @@ template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
 
 /** No amount larger than this (in satoshi) is valid */
-static const int64_t MAX_MONEY = (int64_t)21000000 * COIN * (int64_t)1000 * COIN;
+static const int64 MAX_MONEY = (int64)21000000 * COIN * (int64)1000 * COIN;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
