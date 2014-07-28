@@ -60,7 +60,7 @@ Object blockToJSON(const CBlock& block, const CBlockIndex* blockindex)
     result.push_back(Pair("height", blockindex->nHeight));
     result.push_back(Pair("version", block.nVersion));
     result.push_back(Pair("merkleroot", block.hashMerkleRoot.GetHex()));
-	if (block.nVersion & CAuxPow::BLOCK_VERSION_AUXPOW) {
+	if (block.nVersion & BLOCK_VERSION_AUXPOW) {
         // this block includes auxpow
         Object auxpow;
         auxpow.push_back(Pair("size", (int)::GetSerializeSize(*block.auxpow, SER_NETWORK, PROTOCOL_VERSION)));
