@@ -5,6 +5,7 @@
 #define BITCOIN_AUXPOW_H
 
 #include "main.h"
+
 class CAuxPow : public CMerkleTx
 {
 public:

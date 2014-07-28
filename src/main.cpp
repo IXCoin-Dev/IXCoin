@@ -1113,6 +1113,10 @@ void CBlockHeader::SetAuxPow(CAuxPow* pow)
         nVersion &=  ~BLOCK_VERSION_AUXPOW;
     auxpow.reset(pow);
 }
+int GetOurChainID()
+{
+    return 0x0004;
+}
 bool CBlockHeader::CheckProofOfWork(int nHeight) const
 {
     if (nHeight >= GetAuxPowStartBlock())
