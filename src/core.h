@@ -369,7 +369,7 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
 
-		nSerSize += CAuxPow::ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
+		nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
     )
 	void SetAuxPow(CAuxPow* pow);
     void SetNull()
@@ -400,78 +400,6 @@ public:
 };
 
 
-/** Used to marshal pointers into hashes for db storage. */
-class CDiskBlockIndex : public CBlockIndex
-{
-public:
-    uint256 hashPrev;
-
-	// if this is an aux work block
-    boost::shared_ptr<CAuxPow> auxpow;
-
-    CDiskBlockIndex() {
-        hashPrev = 0;
-		auxpow.reset();
-    }
-
-    explicit CDiskBlockIndex(CBlockIndex* pindex, boost::shared_ptr<CAuxPow> auxpow) : CBlockIndex(*pindex) {
-        hashPrev = (pprev ? pprev->GetBlockHash() : 0);
-        this->auxpow = auxpow;
-    }
-
-    IMPLEMENT_SERIALIZE
-    (
-        if (!(nType & SER_GETHASH))
-            READWRITE(VARINT(nVersion));
-
-        READWRITE(VARINT(nHeight));
-        READWRITE(VARINT(nStatus));
-        READWRITE(VARINT(nTx));
-        if (nStatus & (BLOCK_HAVE_DATA | BLOCK_HAVE_UNDO))
-            READWRITE(VARINT(nFile));
-        if (nStatus & BLOCK_HAVE_DATA)
-            READWRITE(VARINT(nDataPos));
-        if (nStatus & BLOCK_HAVE_UNDO)
-            READWRITE(VARINT(nUndoPos));
-
-        // block header
-        READWRITE(this->nVersion);
-        READWRITE(hashPrev);
-        READWRITE(hashMerkleRoot);
-        READWRITE(nTime);
-        READWRITE(nBits);
-        READWRITE(nNonce);
-		CAuxPow::ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
-    )
-
-    uint256 GetBlockHash() const
-    {
-        CBlockHeader block;
-        block.nVersion        = nVersion;
-        block.hashPrevBlock   = hashPrev;
-        block.hashMerkleRoot  = hashMerkleRoot;
-        block.nTime           = nTime;
-        block.nBits           = nBits;
-        block.nNonce          = nNonce;
-        return block.GetHash();
-    }
-
-
-    std::string ToString() const
-    {
-        std::string str = "CDiskBlockIndex(";
-        str += CBlockIndex::ToString();
-        str += strprintf("\n                hashBlock=%s, hashPrev=%s)",
-            GetBlockHash().ToString().c_str(),
-            hashPrev.ToString().c_str());
-        return str;
-    }
-	bool CheckIndex() const;
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
-};
 class CBlock : public CBlockHeader
 {
 public:
