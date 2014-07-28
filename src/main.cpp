@@ -2245,10 +2245,7 @@ int GetAuxPowStartBlock()
         return 25000; // Never on prodnet
 }
 
-int GetOurChainID()
-{
-    return 0x0004;
-}
+
 bool FindBlockPos(CValidationState &state, CDiskBlockPos &pos, unsigned int nAddSize, unsigned int nHeight, uint64_t nTime, bool fKnown = false)
 {
     bool fUpdatedLast = false;
