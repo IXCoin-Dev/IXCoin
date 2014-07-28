@@ -432,18 +432,9 @@ public:
         vtx.clear();
         vMerkleTree.clear();
     }
-
     CBlockHeader GetBlockHeader() const
     {
         CBlockHeader block;
-		if (nVersion & BLOCK_VERSION_AUXPOW) {
-			CDiskBlockIndex diskblockindex;
-			// auxpow is not in memory, load CDiskBlockHeader
-			// from database to get it
-	  
-			pblocktree->ReadDiskBlockIndex(*phashBlock, diskblockindex);
-			block.auxpow = diskblockindex.auxpow;
-		}
         block.nVersion       = nVersion;
         block.hashPrevBlock  = hashPrevBlock;
         block.hashMerkleRoot = hashMerkleRoot;

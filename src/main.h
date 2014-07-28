@@ -814,15 +814,25 @@ public:
 
     CBlockHeader GetBlockHeader() const
     {
-        CBlockHeader block;
-        block.nVersion       = nVersion;
-        if (pprev)
-            block.hashPrevBlock = pprev->GetBlockHash();
-        block.hashMerkleRoot = hashMerkleRoot;
-        block.nTime          = nTime;
-        block.nBits          = nBits;
-        block.nNonce         = nNonce;
-        return block;
+		CBlockHeader block;
+	  
+		if (nVersion & BLOCK_VERSION_AUXPOW) {
+			CDiskBlockIndex diskblockindex;
+			// auxpow is not in memory, load CDiskBlockHeader
+			// from database to get it
+	  
+			pblocktree->ReadDiskBlockIndex(*phashBlock, diskblockindex);
+			block.auxpow = diskblockindex.auxpow;
+		}
+
+		block.nVersion       = nVersion;
+		if (pprev)
+			block.hashPrevBlock = pprev->GetBlockHash();
+		block.hashMerkleRoot = hashMerkleRoot;
+		block.nTime          = nTime;
+		block.nBits          = nBits;
+		block.nNonce         = nNonce;
+		return block;
     }
 
     uint256 GetBlockHash() const
