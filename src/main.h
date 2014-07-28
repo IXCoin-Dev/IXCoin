@@ -19,7 +19,7 @@
 #include "sync.h"
 #include "txmempool.h"
 #include "uint256.h"
-
+#include "auxpow.h"
 #include <algorithm>
 #include <exception>
 #include <map>
@@ -34,6 +34,27 @@ class CBlockIndex;
 class CBloomFilter;
 class CInv;
 class CAuxPow;
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
+enum
+{
+    // primary version
+    BLOCK_VERSION_DEFAULT        = (1 << 0),
+
+    // modifiers
+    BLOCK_VERSION_AUXPOW         = (1 << 8),
+
+    // bits allocated for chain ID
+    BLOCK_VERSION_CHAIN_START    = (1 << 16),
+    BLOCK_VERSION_CHAIN_END      = (1 << 30),
+};
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
@@ -104,18 +125,6 @@ extern unsigned int nCoinCacheSize;
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64_t nMinDiskSpace = 52428800;
 
-enum
-{
-    // primary version
-    BLOCK_VERSION_DEFAULT        = (1 << 0),
-
-    // modifiers
-    BLOCK_VERSION_AUXPOW         = (1 << 8),
-
-    // bits allocated for chain ID
-    BLOCK_VERSION_CHAIN_START    = (1 << 16),
-    BLOCK_VERSION_CHAIN_END      = (1 << 30),
-};
 
 class CCoinsDB;
 class CBlockTreeDB;

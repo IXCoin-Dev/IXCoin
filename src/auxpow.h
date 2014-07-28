@@ -4,8 +4,7 @@
 #ifndef BITCOIN_AUXPOW_H
 #define BITCOIN_AUXPOW_H
 
-#include "miner.h"
-
+#include "main.h"
 class CAuxPow : public CMerkleTx
 {
 public:

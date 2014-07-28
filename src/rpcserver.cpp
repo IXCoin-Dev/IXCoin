@@ -10,7 +10,7 @@
 #include "main.h"
 #include "ui_interface.h"
 #include "util.h"
-#include "auxpow.h"
+
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
