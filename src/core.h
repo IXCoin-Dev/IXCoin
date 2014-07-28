@@ -15,7 +15,7 @@
 class CTransaction;
 
 /** No amount larger than this (in satoshi) is valid */
-static const int64_t MAX_MONEY = 21000000 * COIN;
+static const int64_t MAX_MONEY = (int64_t)21000000 * COIN * (int64_t)1000 * COIN;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -345,13 +345,14 @@ class CBlockHeader
 {
 public:
     // header
-    static const int CURRENT_VERSION=2;
+    static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
+	boost::shared_ptr<CAuxPow> auxpow;
 
     CBlockHeader()
     {
@@ -367,18 +368,23 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
-    )
 
+		nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
+    )
+	void SetAuxPow(CAuxPow* pow);
     void SetNull()
     {
-        nVersion = CBlockHeader::CURRENT_VERSION;
+        nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
         hashPrevBlock = 0;
         hashMerkleRoot = 0;
         nTime = 0;
         nBits = 0;
         nNonce = 0;
     }
-
+    int GetChainID() const
+    {
+        return nVersion / BLOCK_VERSION_CHAIN_START;
+    }
     bool IsNull() const
     {
         return (nBits == 0);
@@ -390,6 +396,7 @@ public:
     {
         return (int64_t)nTime;
     }
+	bool CheckProofOfWork(int nHeight) const;
 };
 
 
@@ -429,6 +436,14 @@ public:
     CBlockHeader GetBlockHeader() const
     {
         CBlockHeader block;
+		if (nVersion & BLOCK_VERSION_AUXPOW) {
+			CDiskBlockIndex diskblockindex;
+			// auxpow is not in memory, load CDiskBlockHeader
+			// from database to get it
+	  
+			pblocktree->ReadDiskBlockIndex(*phashBlock, diskblockindex);
+			block.auxpow = diskblockindex.auxpow;
+		}
         block.nVersion       = nVersion;
         block.hashPrevBlock  = hashPrevBlock;
         block.hashMerkleRoot = hashMerkleRoot;

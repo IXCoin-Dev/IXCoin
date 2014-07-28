@@ -5,15 +5,26 @@
 
 #ifndef BITCOIN_MINER_H
 #define BITCOIN_MINER_H
-
+#include "main.h"
 #include <stdint.h>
-
+#include <boost/shared_ptr.hpp>
 class CBlock;
 class CBlockIndex;
 struct CBlockTemplate;
 class CReserveKey;
 class CScript;
 class CWallet;
+class CAuxPow;
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
+
 
 /** Run the miner threads */
 void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads);
@@ -22,6 +33,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn);
 CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey);
 /** Modify the extranonce in a block */
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
+void IncrementExtraNonceWithAux(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce, std::vector<unsigned char>& vchAux);
 /** Do mining precalculation */
 void FormatHashBuffers(CBlock* pblock, char* pmidstate, char* pdata, char* phash1);
 /** Check mined block */

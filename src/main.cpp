@@ -11,6 +11,7 @@
 #include "checkpoints.h"
 #include "checkqueue.h"
 #include "init.h"
+#include "auxpow.h"
 #include "net.h"
 #include "txdb.h"
 #include "txmempool.h"
@@ -1104,7 +1105,53 @@ bool WriteBlockToDisk(CBlock& block, CDiskBlockPos& pos)
 
     return true;
 }
+void CBlockHeader::SetAuxPow(CAuxPow* pow)
+{
+    if (pow != NULL)
+        nVersion |=  BLOCK_VERSION_AUXPOW;
+    else
+        nVersion &=  ~BLOCK_VERSION_AUXPOW;
+    auxpow.reset(pow);
+}
+bool CBlockHeader::CheckProofOfWork(int nHeight) const
+{
+    if (nHeight >= GetAuxPowStartBlock())
+    {
+        // Prevent same work from being submitted twice:
+        // - this block must have our chain ID
+        // - parent block must not have the same chain ID (see CAuxPow::Check)
+        // - index of this chain in chain merkle tree must be pre-determined (see CAuxPow::Check)
+        if (!fTestNet && nHeight != INT_MAX && GetChainID() != GetOurChainID())
+            return error("CheckProofOfWork() : block does not have our chain ID");
 
+        if (auxpow.get() != NULL)
+        {
+            if (!auxpow->Check(GetHash(), GetChainID()))
+                return error("CheckProofOfWork() : AUX POW is not valid");
+            // Check proof of work matches claimed amount
+            if (!::CheckProofOfWork(auxpow->GetParentBlockHash(), nBits))
+                return error("CheckProofOfWork() : AUX proof of work failed");
+        }
+        else
+        {
+            // Check proof of work matches claimed amount
+            if (!::CheckProofOfWork(GetHash(), nBits))
+                return error("CheckProofOfWork() : proof of work failed");
+        }
+    }
+    else
+    {
+        if (auxpow.get() != NULL)
+        {
+            return error("CheckProofOfWork() : AUX POW is not allowed at this block");
+        }
+
+        // Check proof of work matches claimed amount
+        if (!::CheckProofOfWork(GetHash(), nBits))
+            return error("CheckProofOfWork() : proof of work failed");
+    }
+    return true;
+}
 bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos)
 {
     block.SetNull();
@@ -1123,7 +1170,7 @@ bool ReadBlockFromDisk(CBlock& block, const CDiskBlockPos& pos)
     }
 
     // Check the header
-    if (!CheckProofOfWork(block.GetHash(), block.nBits))
+    if (!CheckProofOfWork(INT_MAX))
         return error("ReadBlockFromDisk : Errors in block header");
 
     return true;
@@ -2159,7 +2206,8 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     pindexNew->nStatus = BLOCK_VALID_TRANSACTIONS | BLOCK_HAVE_DATA;
     setBlockIndexValid.insert(pindexNew);
 
-    if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(pindexNew)))
+    /* write both the immutable data (CDiskBlockIndex) and the mutable data (BlockIndex) */
+    if (!pblocktree->WriteDiskBlockIndex(CDiskBlockIndex(pindexNew, this->auxpow)) || !pblocktree->WriteBlockIndex(*pindexNew))
         return state.Abort(_("Failed to write block index"));
 
     // New best?
@@ -2185,7 +2233,22 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     return true;
 }
 
+// Start accepting AUX POW at this block
+// 
+// Even if we do not accept AUX POW ourselves, we can always be the parent chain.
+ 
+int GetAuxPowStartBlock()
+{
+    if (fTestNet)
+        return 0; // Always on testnet
+    else
+        return 25000; // Never on prodnet
+}
 
+int GetOurChainID()
+{
+    return 0x0004;
+}
 bool FindBlockPos(CValidationState &state, CDiskBlockPos &pos, unsigned int nAddSize, unsigned int nHeight, uint64_t nTime, bool fKnown = false)
 {
     bool fUpdatedLast = false;

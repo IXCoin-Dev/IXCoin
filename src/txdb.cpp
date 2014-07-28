@@ -218,8 +218,16 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
 
-                if (!pindexNew->CheckIndex())
-                    return error("LoadBlockIndex() : CheckIndex failed: %s", pindexNew->ToString());
+				if (!diskindex.CheckIndex())
+                    return error("LoadBlockIndex() : CheckIndex failed: %s", pindexNew->ToString().c_str());
+
+                pcursor->Next(); // now we should be on the 'b' subkey
+
+                assert(pcursor->Valid());
+				// JS TODO: Merge-mining block parsing addon?
+                slValue = pcursor->value();
+                CDataStream ssValue_mutable(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
+                ssValue_mutable >> *pindexNew;        // read all mutable data
 
                 pcursor->Next();
             } else {

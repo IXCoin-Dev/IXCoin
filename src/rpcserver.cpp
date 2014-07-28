@@ -10,6 +10,7 @@
 #include "main.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "auxpow.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
@@ -83,7 +84,7 @@ void RPCTypeCheck(const Object& o,
 int64_t AmountFromValue(const Value& value)
 {
     double dAmount = value.get_real();
-    if (dAmount <= 0.0 || dAmount > 21000000.0)
+    if (dAmount <= 0.0 || dAmount > MAX_MONEY)
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
     int64_t nAmount = roundint64(dAmount * COIN);
     if (!MoneyRange(nAmount))
@@ -254,7 +255,9 @@ static const CRPCCommand vRPCCommands[] =
     { "getmininginfo",          &getmininginfo,          true,      false,      false },
     { "getnetworkhashps",       &getnetworkhashps,       true,      false,      false },
     { "submitblock",            &submitblock,            false,     false,      false },
-
+	{ "getworkaux",             &getworkaux,             true,      false,		false },
+	{ "getauxblock",            &getauxblock,            true,      false,		false },
+    { "buildmerkletree",        &buildmerkletree,        false,     false,		false },
     /* Raw transactions */
     { "createrawtransaction",   &createrawtransaction,   false,     false,      false },
     { "decoderawtransaction",   &decoderawtransaction,   false,     false,      false },
@@ -711,7 +714,8 @@ void JSONRequest::parse(const Value& valRequest)
     if (valMethod.type() != str_type)
         throw JSONRPCError(RPC_INVALID_REQUEST, "Method must be a string");
     strMethod = valMethod.get_str();
-    if (strMethod != "getwork" && strMethod != "getblocktemplate")
+    if (strMethod != "getwork" && strMethod != "getblocktemplate" &&
+            strMethod != "getworkaux" && strMethod != "getauxblock")
         LogPrint("rpc", "ThreadRPCServer method=%s\n", strMethod);
 
     // Parse params

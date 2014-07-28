@@ -39,38 +39,43 @@ namespace Checkpoints
     // + Contains no strange transactions
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-        ( 11111, uint256("0x0000000069e244f73d78e8fd29ba2fd2ed618bd6fa2ee92559f542fdb26e7c1d"))
-        ( 33333, uint256("0x000000002dd5588a74784eaa7ab0507a18ad16a236e7b1ce69f00d7ddfb5d0a6"))
-        ( 74000, uint256("0x0000000000573993a3c9e41ce34471c079dcf5f52a0e824a81e7f953b8661a20"))
-        (105000, uint256("0x00000000000291ce28027faea320c8d2b054b2e0fe44a773f3eefb151d6bdc97"))
-        (134444, uint256("0x00000000000005b12ffd4cd315cd34ffd4a594f430ac814c91184a0d42d2b0fe"))
-        (168000, uint256("0x000000000000099e61ea72015e79632f216fe6cb33d7899acb35b75c8303b763"))
-        (193000, uint256("0x000000000000059f452a5f7340de6682a977387c17010ff6e6c3bd83ca8b1317"))
-        (210000, uint256("0x000000000000048b95347e83192f69cf0366076336c639f9b7228e9ba171342e"))
-        (216116, uint256("0x00000000000001b4f4b433e81ee46494af945cf96014816a4e2370f11b23df4e"))
-        (225430, uint256("0x00000000000001c108384350f74090433e7fcf79a606b8e797f065b130575932"))
-        (250000, uint256("0x000000000000003887df1f29024b06fc2200b55f8af8f35453d7be294df2d214"))
-        (279000, uint256("0x0000000000000001ae8c72a0b0c301f67e3afca10e819efa9041e458e9bd7e40"))
-        ;
+	// before block 14640, the retarget period in Devcoin was 1 week
+	// the function ComputeMinWork uses the current retarget period
+	// of 3 hours, this is no problem UNLESS someone adds a checkpoint before
+	// block 14640, should be no problem....
+	( 2500, uint256("0x000000001871a2314936d39b85174cc911bf6fd58d3877412ee7b69a48e7e29e"))
+	( 4500, uint256("0x000000000967cc95711f66f804e3f431298686d681d2d5760f61856954d08faf"))
+	( 5250, uint256("0x00000000085702bfbf27daffb638be65aceb78a5f464b12539b51c1b9c548421"))
+	( 8900, uint256("0x00000000001bb8090630fcabb82ad0ab75df3eb5b008956b3ae2a352a4324f19"))
+	( 23500, uint256("0x000000000b83c3c9753d2440b91121cb0ff220bb23c136c6d09a539207e292fb"))
+	( 54800, uint256("0x04e8dcc91ff2aa0f1197f88551b4cb24ccef02ea51081b4d05ab4e3a38554137"))
+	( 67720, uint256("0x0a111b265d89f77b4c86fa6f44e3e2ad876547b1eccf19319cde922b42c1161e"))	;
+
     static const CCheckpointData data = {
         &mapCheckpoints,
-        1389047471, // * UNIX timestamp of last checkpoint block
-        30549816,   // * total number of transactions between genesis and last checkpoint
+        1354231672, // * UNIX timestamp of last checkpoint block
+        936858,     // * total number of transactions between genesis and last checkpoint
                     //   (the tx=... number in the SetBestChain debug.log lines)
-        60000.0     // * estimated number of transactions per day after checkpoint
+        1000.0      // * estimated number of transactions per day after checkpoint
     };
 
-    static MapCheckpoints mapCheckpointsTestnet =
-        boost::assign::map_list_of
-        ( 546, uint256("000000002a936ca763904c3c35fce2f3556c559c0214345d31b1bcebf76acb70"))
-        ;
+    /* Devcoin had not testnet checkblocks, if they even start to exist, they can be added here */
+    static MapCheckpoints mapCheckpointsTestnet  = boost::assign::map_list_of 
+		(0,  uint256("0x00000000fc09a99bd5116e9cedcad35d2145962799e58bbfd66ebdeb4e95235f"));
+    static const CCheckpointData data = {
+        &mapCheckpoints,
+        1354231672, // * UNIX timestamp of last checkpoint block
+        936858,     // * total number of transactions between genesis and last checkpoint
+                    //   (the tx=... number in the SetBestChain debug.log lines)
+        1000.0      // * estimated number of transactions per day after checkpoint
+    };
+
     static const CCheckpointData dataTestnet = {
         &mapCheckpointsTestnet,
-        1338180505,
-        16341,
-        300
+        1387426393,
+        1,
+        1
     };
-
     static MapCheckpoints mapCheckpointsRegtest =
         boost::assign::map_list_of
         ( 0, uint256("0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"))

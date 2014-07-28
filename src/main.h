@@ -28,10 +28,12 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <boost/shared_ptr.hpp>
 
 class CBlockIndex;
 class CBloomFilter;
 class CInv;
+class CAuxPow;
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
@@ -102,6 +104,18 @@ extern unsigned int nCoinCacheSize;
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64_t nMinDiskSpace = 52428800;
 
+enum
+{
+    // primary version
+    BLOCK_VERSION_DEFAULT        = (1 << 0),
+
+    // modifiers
+    BLOCK_VERSION_AUXPOW         = (1 << 8),
+
+    // bits allocated for chain ID
+    BLOCK_VERSION_CHAIN_START    = (1 << 16),
+    BLOCK_VERSION_CHAIN_END      = (1 << 30),
+};
 
 class CCoinsDB;
 class CBlockTreeDB;
@@ -823,7 +837,10 @@ public:
 
     bool CheckIndex() const
     {
-        return CheckProofOfWork(GetBlockHash(), nBits);
+		if (nVersion & BLOCK_VERSION_AUXPOW)
+			return CheckProofOfWork(auxpow->GetParentBlockHash(), nBits);
+		else
+			return CheckProofOfWork(GetBlockHash(), nBits);
     }
 
     enum { nMedianTimeSpan=11 };
@@ -873,12 +890,17 @@ class CDiskBlockIndex : public CBlockIndex
 public:
     uint256 hashPrev;
 
+	// if this is an aux work block
+    boost::shared_ptr<CAuxPow> auxpow;
+
     CDiskBlockIndex() {
         hashPrev = 0;
+		auxpow.reset();
     }
 
-    explicit CDiskBlockIndex(CBlockIndex* pindex) : CBlockIndex(*pindex) {
+    explicit CDiskBlockIndex(CBlockIndex* pindex, boost::shared_ptr<CAuxPow> auxpow) : CBlockIndex(*pindex) {
         hashPrev = (pprev ? pprev->GetBlockHash() : 0);
+        this->auxpow = auxpow;
     }
 
     IMPLEMENT_SERIALIZE
@@ -903,6 +925,7 @@ public:
         READWRITE(nTime);
         READWRITE(nBits);
         READWRITE(nNonce);
+		ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
     )
 
     uint256 GetBlockHash() const
@@ -927,7 +950,7 @@ public:
             hashPrev.ToString().c_str());
         return str;
     }
-
+	bool CheckIndex() const;
     void print() const
     {
         LogPrintf("%s\n", ToString().c_str());
