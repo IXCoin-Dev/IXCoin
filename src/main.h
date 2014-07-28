@@ -835,14 +835,6 @@ public:
         return (CBigNum(1)<<256) / (bnTarget+1);
     }
 
-    bool CheckIndex() const
-    {
-		if (nVersion & BLOCK_VERSION_AUXPOW)
-			return CheckProofOfWork(auxpow->GetParentBlockHash(), nBits);
-		else
-			return CheckProofOfWork(GetBlockHash(), nBits);
-    }
-
     enum { nMedianTimeSpan=11 };
 
     int64_t GetMedianTimePast() const

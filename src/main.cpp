@@ -2643,12 +2643,13 @@ bool ProcessBlock(CValidationState &state, CNode* pfrom, CBlock* pblock, CDiskBl
     return true;
 }
 
-
-
-
-
-
-
+bool CDiskBlockIndex::CheckIndex() const
+{
+    if (nVersion & BLOCK_VERSION_AUXPOW)
+        return CheckProofOfWork(auxpow->GetParentBlockHash(), nBits);
+    else
+        return CheckProofOfWork(GetBlockHash(), nBits);
+}
 
 CMerkleBlock::CMerkleBlock(const CBlock& block, CBloomFilter& filter)
 {
