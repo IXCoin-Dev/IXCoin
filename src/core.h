@@ -11,19 +11,10 @@
 #include "serialize.h"
 #include "uint256.h"
 #include <stdint.h>
-#include "auxpow.h"
 class CTransaction;
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
 
 /** No amount larger than this (in satoshi) is valid */
-static const int64 MAX_MONEY = (int64)21000000 * COIN * (int64)1000 * COIN;
+static const int64_t MAX_MONEY = (int64_t)21000000 * COIN * (int64_t)100 * COIN;
 inline bool MoneyRange(int64_t nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
@@ -342,70 +333,6 @@ public:
 };
 
 
-/** Nodes collect new transactions into a block, hash them into a hash tree,
- * and scan through nonce values to make the block's hash satisfy proof-of-work
- * requirements.  When they solve the proof-of-work, they broadcast the block
- * to everyone and the block is added to the block chain.  The first transaction
- * in the block is a special one that creates a new coin owned by the creator
- * of the block.
- */
-class CBlockHeader
-{
-public:
-    // header
-	static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
-    int nVersion;
-    uint256 hashPrevBlock;
-    uint256 hashMerkleRoot;
-    unsigned int nTime;
-    unsigned int nBits;
-    unsigned int nNonce;
-	boost::shared_ptr<CAuxPow> auxpow;
-
-    CBlockHeader()
-    {
-        SetNull();
-    }
-
-    IMPLEMENT_SERIALIZE
-    (
-        READWRITE(this->nVersion);
-        nVersion = this->nVersion;
-        READWRITE(hashPrevBlock);
-        READWRITE(hashMerkleRoot);
-        READWRITE(nTime);
-        READWRITE(nBits);
-        READWRITE(nNonce);
-
-		nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
-    )
-	void SetAuxPow(CAuxPow* pow);
-    void SetNull()
-    {
-		nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
-        hashPrevBlock = 0;
-        hashMerkleRoot = 0;
-        nTime = 0;
-        nBits = 0;
-        nNonce = 0;
-    }
-    int GetChainID() const
-    {
-        return nVersion / BLOCK_VERSION_CHAIN_START;
-    }
-    bool IsNull() const
-    {
-        return (nBits == 0);
-    }
-
-    uint256 GetHash() const;
-
-    int64_t GetBlockTime() const
-    {
-        return (int64_t)nTime;
-    }
-	bool CheckProofOfWork(int nHeight) const;
-};
 
 
 class CBlock : public CBlockHeader
