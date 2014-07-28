@@ -2240,7 +2240,7 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
  
 int GetAuxPowStartBlock()
 {
-    if (fTestNet)
+    if (TestNet())
         return 0; // Always on testnet
     else
         return 25000; // Never on prodnet
