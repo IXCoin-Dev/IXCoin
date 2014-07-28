@@ -25,6 +25,7 @@ DIST_SUBDIRS = . qt test
 .PHONY: FORCE
 # bitcoin core #
 BITCOIN_CORE_H = \
+  auxpow.h \	
   addrman.h \
   alert.h \
   allocators.h \
@@ -88,6 +89,7 @@ obj/build.h: FORCE
 version.o: obj/build.h
 
 libbitcoin_server_a_SOURCES = \
+  auxpow.cpp \
   addrman.cpp \
   alert.cpp \
   bloom.cpp \
