@@ -35,10 +35,7 @@ enum
 	BLOCK_VERSION_CHAIN_START    = (1 << 16),
 	BLOCK_VERSION_CHAIN_END      = (1 << 30),
 };
-int GetOurChainID()
-{
-	return 0x0004;
-}
+int GetOurChainID();
 
 /** No amount larger than this (in satoshi) is valid */
 static const int64_t MAX_MONEY = (int64_t)21000000 * (int64_t)1000*COIN;

@@ -43,7 +43,10 @@ public:
     }
 };
 
-
+int GetOurChainID();
+{
+	return 0x0004;
+}
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
 {
