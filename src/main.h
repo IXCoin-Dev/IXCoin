@@ -9,7 +9,7 @@
 #if defined(HAVE_CONFIG_H)
 #include "bitcoin-config.h"
 #endif
-
+#include "auxpow.h"
 #include "bignum.h"
 #include "chainparams.h"
 #include "coins.h"
@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "auxpow.h"
+
 class CBlockIndex;
 class CBloomFilter;
 class CInv;

@@ -7,12 +7,13 @@
 #define BITCOIN_CORE_H
 
 
+#include "auxpow.h"
 #include "script.h"
 #include "serialize.h"
 #include "uint256.h"
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
-#include "auxpow.h"
+
 
 class CTransaction;
 
