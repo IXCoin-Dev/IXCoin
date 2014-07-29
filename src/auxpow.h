@@ -5,10 +5,6 @@
 #define BITCOIN_AUXPOW_H
 
 #include "main.h"
-int GetOurChainID()
-{
-    return 0x0004;
-}
 class CAuxPow : public CMerkleTx
 {
 public:
