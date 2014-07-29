@@ -43,7 +43,7 @@ public:
     }
 };
 
-int GetOurChainID();
+int GetOurChainID()
 {
 	return 0x0004;
 }
