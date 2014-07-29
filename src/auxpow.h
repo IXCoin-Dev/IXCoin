@@ -4,7 +4,12 @@
 #ifndef BITCOIN_AUXPOW_H
 #define BITCOIN_AUXPOW_H
 
-#include "main.h"
+#include "script.h"
+#include "init.h"
+#include <vector>
+#include <boost/shared_ptr.hpp>
+#include <sstream>
+
 class CAuxPow : public CMerkleTx
 {
 public:
@@ -50,12 +55,6 @@ int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nTy
 
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
-
-extern template <> int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
-
-extern template <> int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-
-extern template <> int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
 
 extern void RemoveMergedMiningHeader(std::vector<unsigned char>& vchAux);
 extern CScript MakeCoinbaseWithAux(unsigned int nBits, unsigned int nExtraNonce, std::vector<unsigned char>& vchAux);
