@@ -71,9 +71,9 @@ bool CBlockTreeDB::WriteDiskBlockIndex(const CDiskBlockIndex& diskblockindex)
 {
     return Write(boost::tuples::make_tuple('b', *diskblockindex.phashBlock, 'a'), diskblockindex);
 }
-bool CBlockTreeDB::WriteBlockIndex(const CDiskBlockIndex& blockindex)
+bool CBlockTreeDB::WriteBlockIndex(const CBlockIndex& blockindex)
 {
-    return Write(make_pair('b', blockindex.GetBlockHash()), blockindex);
+    return Write(boost::tuples::make_tuple('b', blockindex.GetBlockHash(), 'b'), blockindex);
 }
 bool CBlockTreeDB::ReadDiskBlockIndex(const uint256 &blkid, CDiskBlockIndex &diskblockindex) {
     return Read(boost::tuples::make_tuple('b', blkid, 'a'), diskblockindex);

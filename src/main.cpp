@@ -1499,7 +1499,7 @@ void static InvalidBlockFound(CBlockIndex *pindex, const CValidationState &state
     }
     if (!state.CorruptionPossible()) {
         pindex->nStatus |= BLOCK_FAILED_VALID;
-        pblocktree->WriteBlockIndex(CDiskBlockIndex(pindex));
+        pblocktree->WriteBlockIndex(*pindex);
         setBlockIndexValid.erase(pindex);
         InvalidChainFound(pindex);
     }
@@ -1905,8 +1905,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
 
         pindex->nStatus = (pindex->nStatus & ~BLOCK_VALID_MASK) | BLOCK_VALID_SCRIPTS;
 
-        CDiskBlockIndex blockindex(pindex);
-        if (!pblocktree->WriteBlockIndex(blockindex))
+        if (!pblocktree->WriteBlockIndex(*pindex))
             return state.Abort(_("Failed to write block index"));
     }
 
@@ -2206,7 +2205,7 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     setBlockIndexValid.insert(pindexNew);
 
     /* write both the immutable data (CDiskBlockIndex) and the mutable data (BlockIndex) */
-    if (!pblocktree->WriteDiskBlockIndex(CDiskBlockIndex(pindexNew, block.auxpow)) || !pblocktree->WriteBlockIndex(CDiskBlockIndex(pindexNew)))
+    if (!pblocktree->WriteDiskBlockIndex(CDiskBlockIndex(pindexNew, block.auxpow)) || !pblocktree->WriteBlockIndex(*pindexNew))
         return state.Abort(_("Failed to write block index"));
 
     // New best?
