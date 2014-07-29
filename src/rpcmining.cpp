@@ -714,7 +714,7 @@ Value getworkaux(const Array& params, bool fHelp)
         IncrementExtraNonceWithAux(pblock, pindexPrev, nExtraNonce, vchAux);
 
         // Save
-        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
+        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, nExtraNonce);
 
         // Pre-build hash buffers
         char pmidstate[32];
@@ -831,11 +831,10 @@ Value getauxblock(const Array& params, bool fHelp)
         // Update block
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
-        static int64 nStart;
+        static int64_t nStart;
 		static CBlock* pblock;
         static CBlockTemplate* pblocktemplate;
 		if (pindexPrev != chainActive.Tip() ||
-			 vchAux != vchAuxPrev ||
             (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60))
         {
             if (pindexPrev != chainActive.Tip())
