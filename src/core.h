@@ -7,22 +7,11 @@
 #define BITCOIN_CORE_H
 
 
-
 #include "script.h"
 #include "serialize.h"
 #include "uint256.h"
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
-class CAuxPow;
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
-
 class CTransaction;
 
 enum
@@ -37,7 +26,7 @@ enum
 	BLOCK_VERSION_CHAIN_START    = (1 << 16),
 	BLOCK_VERSION_CHAIN_END      = (1 << 30),
 };
-int GetOurChainID();
+
 
 /** No amount larger than this (in satoshi) is valid */
 static const int64_t MAX_MONEY = (int64_t)21000000 * (int64_t)1000*COIN;
