@@ -191,45 +191,55 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
     leveldb::Iterator *pcursor = NewIterator();
 
     CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
-    ssKeySet << make_pair('b', uint256(0));
+    ssKeySet << boost::tuples::make_tuple('b', uint256(0), 'a'); // 'b' is the prefix for BlockIndex, 'a' sigifies the first part
+    uint256 hash;
+    char cType;
     pcursor->Seek(ssKeySet.str());
 
     // Load mapBlockIndex
     while (pcursor->Valid()) {
-        boost::this_thread::interruption_point();
         try {
+            boost::this_thread::interruption_point();
             leveldb::Slice slKey = pcursor->key();
             CDataStream ssKey(slKey.data(), slKey.data()+slKey.size(), SER_DISK, CLIENT_VERSION);
-            char chType;
-            ssKey >> chType;
-            if (chType == 'b') {
-                leveldb::Slice slValue = pcursor->value();
-                CDataStream ssValue(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
-                CDiskBlockIndex diskindex;
-                ssValue >> diskindex;
+            ssKey >> cType;
+            // each 'b' key is a triple with .second = hash and .third = 'a' or 'b'
+            // the 'a' key is read first and the 'b' key second
+            // the ordering in LevelDB causes us to see everything in the right order
+            if (cType == 'b') {
+                ssKey >> hash;
 
-                // Construct block index object
-                CBlockIndex* pindexNew = InsertBlockIndex(diskindex.GetBlockHash());
+                leveldb::Slice slValue = pcursor->value();
+                CDataStream ssValue_immutable(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
+                CDiskBlockIndex diskindex;
+                ssValue_immutable >> diskindex;     // read all immutable data
+
+                // Construct immutable parts of block index object
+                CBlockIndex* pindexNew = InsertBlockIndex(hash);
+                assert(diskindex.CalcBlockHash() == *pindexNew->phashBlock); // paranoia check
+
                 pindexNew->pprev          = InsertBlockIndex(diskindex.hashPrev);
                 pindexNew->nHeight        = diskindex.nHeight;
-                pindexNew->nFile          = diskindex.nFile;
-                pindexNew->nDataPos       = diskindex.nDataPos;
-                pindexNew->nUndoPos       = diskindex.nUndoPos;
                 pindexNew->nVersion       = diskindex.nVersion;
                 pindexNew->hashMerkleRoot = diskindex.hashMerkleRoot;
                 pindexNew->nTime          = diskindex.nTime;
                 pindexNew->nBits          = diskindex.nBits;
                 pindexNew->nNonce         = diskindex.nNonce;
-                pindexNew->nStatus        = diskindex.nStatus;
                 pindexNew->nTx            = diskindex.nTx;
 
-				if (!diskindex.CheckIndex())
+                // Watch for genesis block
+                if (pindexGenesisBlock == NULL && pindexNew->GetBlockHash() == hashGenesisBlock)
+                    pindexGenesisBlock = pindexNew;
+
+                // CheckIndex needs phashBlock to be set
+                diskindex.phashBlock = pindexNew->phashBlock;
+                if (!diskindex.CheckIndex())
                     return error("LoadBlockIndex() : CheckIndex failed: %s", pindexNew->ToString().c_str());
 
                 pcursor->Next(); // now we should be on the 'b' subkey
 
                 assert(pcursor->Valid());
-				// JS TODO: Merge-mining block parsing addon?
+
                 slValue = pcursor->value();
                 CDataStream ssValue_mutable(slValue.data(), slValue.data()+slValue.size(), SER_DISK, CLIENT_VERSION);
                 ssValue_mutable >> *pindexNew;        // read all mutable data
