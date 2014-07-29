@@ -2193,7 +2193,7 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     if (miPrev != mapBlockIndex.end())
     {
 		// only possible if pindexNew is not the genesis block ?!?!!?
-		assert(pindexNew->phashBlock != Params().HashGenesisBlock());
+		assert(pindexNew->GetBlockHash() != Params().HashGenesisBlock());
         pindexNew->pprev = (*miPrev).second;	// cacheBlockIndex assignment pprev
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
     }
