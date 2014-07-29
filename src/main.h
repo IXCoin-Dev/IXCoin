@@ -32,7 +32,6 @@
 class CBlockIndex;
 class CBloomFilter;
 class CInv;
-class CAuxPow;
 
 
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
@@ -481,16 +480,6 @@ public:
 };
 
 
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
-
 /** Data structure that represents a partial merkle tree.
  *
  * It respresents a subset of the txid's of a known block, in a way that
@@ -883,66 +872,6 @@ public:
 };
 
 
-
-/** Used to marshal pointers into hashes for db storage. */
-class CDiskBlockIndex : public CBlockIndex
-{
-public:
-    uint256 hashPrev;
-
-	// if this is an aux work block
-    boost::shared_ptr<CAuxPow> auxpow;
-
-    CDiskBlockIndex() {
-        hashPrev = 0;
-		auxpow.reset();
-    }
-
-    explicit CDiskBlockIndex(CBlockIndex* pindex, boost::shared_ptr<CAuxPow> auxpow) : CBlockIndex(*pindex) {
-        hashPrev = (pprev ? pprev->GetBlockHash() : 0);
-        this->auxpow = auxpow;
-    }
-
-    IMPLEMENT_SERIALIZE
-    (
-        /* immutable stuff goes here, mutable stuff
-         * has SERIALIZE functions in CDiskBlockIndex */
-        if (!(nType & SER_GETHASH))
-            READWRITE(VARINT(nVersion));
-
-        READWRITE(VARINT(nHeight));
-        READWRITE(VARINT(nTx));
-
-        // block header
-        READWRITE(this->nVersion);
-        READWRITE(hashPrev);
-        READWRITE(hashMerkleRoot);
-        READWRITE(nTime);
-        READWRITE(nBits);
-        READWRITE(nNonce);
-        ReadWriteAuxPow(s, auxpow, nType, this->nVersion, ser_action);
-    )
-
-    uint256 CalcBlockHash() const
-    {
-        CBlockHeader block;
-        block.nVersion        = nVersion;
-        block.hashPrevBlock   = hashPrev;
-        block.hashMerkleRoot  = hashMerkleRoot;
-        block.nTime           = nTime;
-        block.nBits           = nBits;
-        block.nNonce          = nNonce;
-        return block.GetHash();
-    }
-
-
-    std::string ToString() const;
-	bool CheckIndex() const;
-    void print() const
-    {
-        LogPrintf("%s\n", ToString().c_str());
-    }
-};
 
 /** Capture information about block/transaction validation */
 class CValidationState {
