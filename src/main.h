@@ -28,7 +28,7 @@
 #include <utility>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-
+#include "auxpow.cpp" 
 class CBlockIndex;
 class CBloomFilter;
 class CInv;

@@ -12,6 +12,7 @@
 #include "uint256.h"
 #include <stdint.h>
 #include <boost/shared_ptr.hpp>
+#include "auxpow.cpp" 
 class CTransaction;
 
 enum
