@@ -9,7 +9,7 @@
 #include "checkpoints.h"
 #include "auxpow.h"
 #include <stdint.h>
-#include "rpcrawtransaction.cpp"
+
 #include "json/json_spirit_value.h"
 
 using namespace json_spirit;

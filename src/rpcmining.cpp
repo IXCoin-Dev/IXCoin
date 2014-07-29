@@ -627,10 +627,12 @@ Value submitblock(const Array& params, bool fHelp)
 
     return Value::null;
 }
+
+
 Value getworkaux(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1)
-        throw runtime_error(
+		throw runtime_error(
             "getworkaux <aux>\n"
             "getworkaux '' <data>\n"
             "getworkaux 'submit' <data>\n"
@@ -650,30 +652,31 @@ Value getworkaux(const Array& params, bool fHelp)
             "  \"aux\" : merkle root of auxiliary chain block hashes\n"
             "  \"auxpow\" : aux proof of work to submit to aux chain\n"
             );
+
     if (vNodes.empty())
-        throw JSONRPCError(-9, "Devcoin is not connected!");
+        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Bitcoin is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(-10, "Devcoin is downloading blocks...");
-    static map<uint256, pair<CBlock*, unsigned int> > mapNewBlock;
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Bitcoin is downloading blocks...");
+
+    typedef map<uint256, pair<CBlock*, CScript> > mapNewBlock_t;
+    static mapNewBlock_t mapNewBlock;    // FIXME: thread safety
     static vector<CBlockTemplate*> vNewBlockTemplate;
-    static CReserveKey reservekey(pwalletMain);
 
     if (params.size() == 1)
-    {
+   {
         static vector<unsigned char> vchAuxPrev;
         vector<unsigned char> vchAux = ParseHex(params[0].get_str());
-
         // Update block
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
-        static int64 nStart;
+        static int64_t nStart;
         static CBlockTemplate* pblocktemplate;
-        if (pindexPrev != pindexBest ||
-            vchAux != vchAuxPrev ||
-            (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 60))
+        if (pindexPrev != chainActive.Tip() ||
+			 vchAux != vchAuxPrev ||
+            (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60))
         {
-            if (pindexPrev != pindexBest)
+            if (pindexPrev != chainActive.Tip())
             {
                 // Deallocate old blocks since they're obsolete now
                 mapNewBlock.clear();
@@ -681,21 +684,29 @@ Value getworkaux(const Array& params, bool fHelp)
                     delete pblocktemplate;
                 vNewBlockTemplate.clear();
             }
-            nTransactionsUpdatedLast = nTransactionsUpdated;
-            pindexPrev = pindexBest;
-            vchAuxPrev = vchAux;
+
+            // Clear pindexPrev so future getworks make a new block, despite any failures from here on
+            pindexPrev = NULL;
+
+            // Store the pindexBest used before CreateNewBlock, to avoid races
+            nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
+            CBlockIndex* pindexPrevNew = chainActive.Tip();
+			vchAuxPrev = vchAux;
             nStart = GetTime();
 
             // Create new block
-            pblocktemplate = CreateNewBlock(reservekey);
+            pblocktemplate = CreateNewBlockWithKey(*pMiningKey);
             if (!pblocktemplate)
-                throw JSONRPCError(-7, "Out of memory");
+                throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
             vNewBlockTemplate.push_back(pblocktemplate);
+
+            // Need to update only after we know CreateNewBlock succeeded
+            pindexPrev = pindexPrevNew;
         }
         CBlock* pblock = &pblocktemplate->block; // pointer for convenience
 
         // Update nTime
-        pblock->nTime = max(pindexPrev->GetMedianTimePast()+1, GetAdjustedTime());
+        UpdateTime(*pblock, pindexPrev);
         pblock->nNonce = 0;
 
         // Update nExtraNonce
@@ -703,9 +714,9 @@ Value getworkaux(const Array& params, bool fHelp)
         IncrementExtraNonceWithAux(pblock, pindexPrev, nExtraNonce, vchAux);
 
         // Save
-        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, nExtraNonce);
+        mapNewBlock[pblock->hashMerkleRoot] = make_pair(pblock, pblock->vtx[0].vin[0].scriptSig);
 
-        // Prebuild hash buffers
+        // Pre-build hash buffers
         char pmidstate[32];
         char pdata[128];
         char phash1[64];
@@ -714,20 +725,18 @@ Value getworkaux(const Array& params, bool fHelp)
         uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
 
         Object result;
-        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate))));
+        result.push_back(Pair("midstate", HexStr(BEGIN(pmidstate), END(pmidstate)))); // deprecated
         result.push_back(Pair("data",     HexStr(BEGIN(pdata), END(pdata))));
-        result.push_back(Pair("hash1",    HexStr(BEGIN(phash1), END(phash1))));
+        result.push_back(Pair("hash1",    HexStr(BEGIN(phash1), END(phash1)))); // deprecated
         result.push_back(Pair("target",   HexStr(BEGIN(hashTarget), END(hashTarget))));
         return result;
     }
     else
     {
-        if (params[0].get_str() != "submit" && params[0].get_str() != "")
-            throw JSONRPCError(-8, "<aux> must be the empty string or 'submit' if work is being submitted");
         // Parse parameters
-        vector<unsigned char> vchData = ParseHex(params[1].get_str());
+        vector<unsigned char> vchData = ParseHex(params[0].get_str());
         if (vchData.size() != 128)
-            throw JSONRPCError(-8, "Invalid parameter");
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter");
         CBlock* pdata = (CBlock*)&vchData[0];
 
         // Byte reverse
@@ -738,11 +747,10 @@ Value getworkaux(const Array& params, bool fHelp)
         if (!mapNewBlock.count(pdata->hashMerkleRoot))
             return false;
         CBlock* pblock = mapNewBlock[pdata->hashMerkleRoot].first;
-        unsigned int nExtraNonce = mapNewBlock[pdata->hashMerkleRoot].second;
+		unsigned int nExtraNonce = mapNewBlock[pdata->hashMerkleRoot].second;
 
         pblock->nTime = pdata->nTime;
         pblock->nNonce = pdata->nNonce;
-
         // Get the aux merkle root from the coinbase
         CScript script = pblock->vtx[0].vin[0].scriptSig;
         opcodetype opcode;
@@ -760,6 +768,7 @@ Value getworkaux(const Array& params, bool fHelp)
         pblock->vtx[0].vin[0].scriptSig = MakeCoinbaseWithAux(pblock->nBits, nExtraNonce, vchAux);
         pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 
+        assert(pwalletMain != NULL);
         if (params.size() > 2)
         {
             // Requested aux proof of work
@@ -787,7 +796,7 @@ Value getworkaux(const Array& params, bool fHelp)
         {
             if (params[0].get_str() == "submit")
             {
-                return CheckWork(pblock, *pwalletMain, reservekey);
+                return CheckWork(pblock, *pwalletMain, *pMiningKey);
             }
             else
             {
@@ -810,26 +819,26 @@ Value getauxblock(const Array& params, bool fHelp)
             "If <hash>, <auxpow> is specified, tries to solve the block based on "
             "the aux proof of work and returns true if it was successful.");
     if (vNodes.empty())
-        throw JSONRPCError(-9, "Devcoin is not connected!");
+        throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "Bitcoin is not connected!");
 
     if (IsInitialBlockDownload())
-        throw JSONRPCError(-10, "Devcoin is downloading blocks...");
+        throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "Bitcoin is downloading blocks...");
 
     static map<uint256, CBlock*> mapNewBlock;
     static vector<CBlockTemplate*> vNewBlockTemplate;
-    static CReserveKey reservekey(pwalletMain);
     if (params.size() == 0)
     {
         // Update block
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
         static int64 nStart;
-	static CBlock* pblock;
+		static CBlock* pblock;
         static CBlockTemplate* pblocktemplate;
-        if (pindexPrev != pindexBest ||
-            (nTransactionsUpdated != nTransactionsUpdatedLast && GetTime() - nStart > 60))
+		if (pindexPrev != chainActive.Tip() ||
+			 vchAux != vchAuxPrev ||
+            (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60))
         {
-            if (pindexPrev != pindexBest)
+            if (pindexPrev != chainActive.Tip())
             {
                 // Deallocate old blocks since they're obsolete now
                 mapNewBlock.clear();
@@ -837,19 +846,24 @@ Value getauxblock(const Array& params, bool fHelp)
                     delete pblocktemplate;
                 vNewBlockTemplate.clear();
             }
-            nTransactionsUpdatedLast = nTransactionsUpdated;
-            pindexPrev = pindexBest;
+			// Clear pindexPrev so future getworks make a new block, despite any failures from here on
+            pindexPrev = NULL;
+            // Store the pindexBest used before CreateNewBlock, to avoid races
+            nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
+            CBlockIndex* pindexPrevNew = chainActive.Tip();
+
             nStart = GetTime();
             // Create new block with nonce = 0 and extraNonce = 1
-            pblocktemplate = CreateNewBlock(reservekey);
+            pblocktemplate = CreateNewBlockWithKey(*pMiningKey);
             if (!pblocktemplate)
-                throw JSONRPCError(-7, "Out of memory");
+                throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
 			pblock = &pblocktemplate->block;
             // Update nTime
-            pblock->nTime = max(pindexPrev->GetMedianTimePast()+1, GetAdjustedTime());
+            UpdateTime(*pblock, pindexPrev);
             pblock->nNonce = 0;
-
+			// Need to update only after we know CreateNewBlock succeeded
+            pindexPrev = pindexPrevNew;
             // Push OP_2 just in case we want versioning later
             pblock->vtx[0].vin[0].scriptSig = CScript() << pblock->nBits << CBigNum(1) << OP_2;
             pblock->hashMerkleRoot = pblock->BuildMerkleTree();
@@ -861,6 +875,7 @@ Value getauxblock(const Array& params, bool fHelp)
             mapNewBlock[pblock->GetHash()] = pblock;
 
             vNewBlockTemplate.push_back(pblocktemplate);
+
         }
         uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
         Object result;
@@ -882,7 +897,7 @@ Value getauxblock(const Array& params, bool fHelp)
 
         CBlock* pblock = mapNewBlock[hash];
         pblock->SetAuxPow(pow);
-        if (!CheckWork(pblock, *pwalletMain, reservekey))
+        if (!CheckWork(pblock, *pwalletMain, *pMiningKey))
         {
             return false;
         }
