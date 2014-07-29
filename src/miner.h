@@ -5,6 +5,7 @@
 
 #ifndef BITCOIN_MINER_H
 #define BITCOIN_MINER_H
+#include <vector>
 #include <stdint.h>
 class CBlock;
 class CBlockIndex;
