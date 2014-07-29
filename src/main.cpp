@@ -3,8 +3,6 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "main.h"
-
 #include "addrman.h"
 #include "alert.h"
 #include "chainparams.h"
@@ -1113,10 +1111,7 @@ void CBlockHeader::SetAuxPow(CAuxPow* pow)
         nVersion &=  ~BLOCK_VERSION_AUXPOW;
     auxpow.reset(pow);
 }
-int GetOurChainID()
-	{
-		return 0x0004;
-	}
+
 bool CBlockHeader::CheckProofOfWork(int nHeight) const
 {
     if (nHeight >= GetAuxPowStartBlock())

@@ -28,31 +28,13 @@
 #include <utility>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-class CAuxPow;
+
 class CBlockIndex;
 class CBloomFilter;
 class CInv;
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
-enum
-{
-	// primary version
-	BLOCK_VERSION_DEFAULT        = (1 << 0),
-
-	// modifiers
-	BLOCK_VERSION_AUXPOW         = (1 << 8),
-
-	// bits allocated for chain ID
-	BLOCK_VERSION_CHAIN_START    = (1 << 16),
-	BLOCK_VERSION_CHAIN_END      = (1 << 30),
-};
 /** The maximum allowed size for a serialized block, in bytes (network rule) */
 static const unsigned int MAX_BLOCK_SIZE = 1000000;
 /** Default for -blockmaxsize and -blockminsize, which control the range of sizes the mining code will create **/
@@ -209,7 +191,7 @@ void Misbehaving(NodeId nodeid, int howmuch);
 bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState &state, const CTransaction &tx, bool fLimitFree,
                         bool* pfMissingInputs, bool fRejectInsaneFee=false);
 
-int GetOurChainID();
+
 
 
 
@@ -944,70 +926,6 @@ public:
     }
 };
 
-/** Nodes collect new transactions into a block, hash them into a hash tree,
- * and scan through nonce values to make the block's hash satisfy proof-of-work
- * requirements.  When they solve the proof-of-work, they broadcast the block
- * to everyone and the block is added to the block chain.  The first transaction
- * in the block is a special one that creates a new coin owned by the creator
- * of the block.
- */
-class CBlockHeader
-{
-public:
-    // header
-	static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
-    int nVersion;
-    uint256 hashPrevBlock;
-    uint256 hashMerkleRoot;
-    unsigned int nTime;
-    unsigned int nBits;
-    unsigned int nNonce;
-	boost::shared_ptr<CAuxPow> auxpow;
-
-    CBlockHeader()
-    {
-        SetNull();
-    }
-
-    IMPLEMENT_SERIALIZE
-    (
-        READWRITE(this->nVersion);
-        nVersion = this->nVersion;
-        READWRITE(hashPrevBlock);
-        READWRITE(hashMerkleRoot);
-        READWRITE(nTime);
-        READWRITE(nBits);
-        READWRITE(nNonce);
-
-		nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
-    )
-	void SetAuxPow(CAuxPow* pow);
-    void SetNull()
-    {
-		nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
-        hashPrevBlock = 0;
-        hashMerkleRoot = 0;
-        nTime = 0;
-        nBits = 0;
-        nNonce = 0;
-    }
-    int GetChainID() const
-    {
-        return nVersion / BLOCK_VERSION_CHAIN_START;
-    }
-    bool IsNull() const
-    {
-        return (nBits == 0);
-    }
-
-    uint256 GetHash() const;
-
-    int64_t GetBlockTime() const
-    {
-        return (int64_t)nTime;
-    }
-	bool CheckProofOfWork(int nHeight) const;
-};
 /** Capture information about block/transaction validation */
 class CValidationState {
 private:
