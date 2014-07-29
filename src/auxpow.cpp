@@ -11,41 +11,7 @@ using namespace boost;
 
 unsigned char pchMergedMiningHeader[] = { 0xfa, 0xbe, 'm', 'm' } ;
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
-    {
-        return ::GetSerializeSize(*auxpow, nType, nVersion);
-    }
-    return 0;
-}
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
-    {
-        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
-    }
-    return 0;
-}
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW)
-    {
-		CAuxPow* newPow = new CAuxPow();
-        auxpow.reset(newPow);
-        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
-    }
-    else
-    {
-        auxpow.reset();
-        return 0;
-    }
-}
 void RemoveMergedMiningHeader(vector<unsigned char>& vchAux)
 {
     if (vchAux.begin() != std::search(vchAux.begin(), vchAux.end(), UBEGIN(pchMergedMiningHeader), UEND(pchMergedMiningHeader)))
