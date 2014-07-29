@@ -2206,7 +2206,7 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     setBlockIndexValid.insert(pindexNew);
 
     /* write both the immutable data (CDiskBlockIndex) and the mutable data (BlockIndex) */
-    if (!pblocktree->WriteDiskBlockIndex(CDiskBlockIndex(pindexNew, this->auxpow)) || !pblocktree->WriteBlockIndex(*pindexNew))
+    if (!pblocktree->WriteDiskBlockIndex(CDiskBlockIndex(pindexNew, block.auxpow)) || !pblocktree->WriteBlockIndex(*pindexNew))
         return state.Abort(_("Failed to write block index"));
 
     // New best?
