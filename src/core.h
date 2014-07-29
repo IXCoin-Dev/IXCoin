@@ -14,7 +14,6 @@
 #include <boost/shared_ptr.hpp>
 class CAuxPow;
 class CTransaction;
-class CBlockIndex;
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
 
@@ -514,6 +513,196 @@ struct CBlockLocator
     }
 };
 
+/** The block chain is a tree shaped structure starting with the
+ * genesis block at the root, with each block potentially having multiple
+ * candidates to be the next block.  pprev and pnext link a path through the
+ * main/longest chain.  A blockindex may have multiple pprev pointing back
+ * to it, but pnext will only point forward to the longest branch, or will
+ * be null if the block is not part of the longest chain.
+ */
+/* a lot of the info inhere can't change, we store the mutable and immutable
+ * data in different places of the DB. This has two consequences:
+ * 1. updating mutable data is more efficient
+ *    (as immutable data doesn't have to be rewritten time and again)
+ * 2. less used immutable data doesn't need to be in memory just
+ *    to be able to update the mutable data, which allows for memory efficient
+ *    caching strategies
+ *
+ * Note: nFile and nDataPos are in the current implementation immutable,
+ *       however, the parsing of those fields is dependent on nStatus
+ *       which is mutable. To stay on the safe side, I think it is best to
+ *       assume the worst. */
+class CBlockIndex
+{
+public:
+    // pointer to the hash of the block, if any. memory is owned by this CBlockIndex
+    const uint256* phashBlock;
+
+    // pointer to the index of the predecessor of this block
+    CBlockIndex* pprev;
+
+    // height of the entry in the chain. The genesis block has height 0
+    int nHeight;			/* immutable */
+
+    // Which # file this block is stored in (blk?????.dat)
+    int nFile;				/* mutable */
+
+    // Byte offset within blk?????.dat where this block's data is stored
+    unsigned int nDataPos;	/* mutable */
+
+    // Byte offset within rev?????.dat where this block's undo data is stored
+    unsigned int nUndoPos;	/* mutable */
+
+    // (memory only) Total amount of work (expected number of hashes) in the chain up to and including this block
+    uint256 nChainWork;
+
+    // Number of transactions in this block.
+    // Note: in a potential headers-first mode, this number cannot be relied upon
+    unsigned int nTx;		/* immutable */
+
+    // (memory only) Number of transactions in the chain up to and including this block
+    unsigned int nChainTx; // change to 64-bit type when necessary; won't happen before 2030
+
+    // Verification status of this block. See enum BlockStatus
+    unsigned int nStatus;	/* mutable */
+
+    // block header
+    int nVersion;			/* immutable */
+    uint256 hashMerkleRoot;	/* immutable */
+    unsigned int nTime;		/* immutable */
+    unsigned int nBits;		/* immutable */
+    unsigned int nNonce;	/* immutable */	
+
+    // (memory only) Sequencial id assigned to distinguish order in which blocks are received.
+    uint32_t nSequenceId;
+
+    CBlockIndex()
+    {
+        phashBlock = NULL;
+        pprev = NULL;
+        nHeight = 0;
+        nFile = 0;
+        nDataPos = 0;
+        nUndoPos = 0;
+        nChainWork = 0;
+        nTx = 0;
+        nChainTx = 0;
+        nStatus = 0;
+        nSequenceId = 0;
+
+        nVersion       = 0;
+        hashMerkleRoot = 0;
+        nTime          = 0;
+        nBits          = 0;
+        nNonce         = 0;
+    }
+
+    CBlockIndex(CBlockHeader& block)
+    {
+        phashBlock = NULL;
+        pprev = NULL;
+        nHeight = 0;
+        nFile = 0;
+        nDataPos = 0;
+        nUndoPos = 0;
+        nChainWork = 0;
+        nTx = 0;
+        nChainTx = 0;
+        nStatus = 0;
+        nSequenceId = 0;
+
+        nVersion       = block.nVersion;
+        hashMerkleRoot = block.hashMerkleRoot;
+        nTime          = block.nTime;
+        nBits          = block.nBits;
+        nNonce         = block.nNonce;
+    }
+    IMPLEMENT_SERIALIZE
+    (
+        /* mutable stuff goes here, immutable stuff
+         * has SERIALIZE functions in CDiskBlockIndex */
+        if (!(nType & SER_GETHASH))
+            READWRITE(VARINT(nVersion));
+
+        READWRITE(VARINT(nStatus));
+        if (nStatus & (BLOCK_HAVE_DATA | BLOCK_HAVE_UNDO))
+            READWRITE(VARINT(nFile));
+        if (nStatus & BLOCK_HAVE_DATA)
+            READWRITE(VARINT(nDataPos));
+        if (nStatus & BLOCK_HAVE_UNDO)
+            READWRITE(VARINT(nUndoPos));
+    )
+    CDiskBlockPos GetBlockPos() const {
+        CDiskBlockPos ret;
+        if (nStatus & BLOCK_HAVE_DATA) {
+            ret.nFile = nFile;
+            ret.nPos  = nDataPos;
+        }
+        return ret;
+    }
+
+    CDiskBlockPos GetUndoPos() const {
+        CDiskBlockPos ret;
+        if (nStatus & BLOCK_HAVE_UNDO) {
+            ret.nFile = nFile;
+            ret.nPos  = nUndoPos;
+        }
+        return ret;
+    }
+
+    CBlockHeader GetBlockHeader() const;
+
+    uint256 GetBlockHash() const
+    {
+        return *phashBlock;
+    }
+
+    int64_t GetBlockTime() const
+    {
+        return (int64_t)nTime;
+    }
+
+    CBigNum GetBlockWork() const
+    {
+        CBigNum bnTarget;
+        bnTarget.SetCompact(nBits);
+        if (bnTarget <= 0)
+            return 0;
+        return (CBigNum(1)<<256) / (bnTarget+1);
+    }
+
+    enum { nMedianTimeSpan=11 };
+
+    int64_t GetMedianTimePast() const
+    {
+        int64_t pmedian[nMedianTimeSpan];
+        int64_t* pbegin = &pmedian[nMedianTimeSpan];
+        int64_t* pend = &pmedian[nMedianTimeSpan];
+
+        const CBlockIndex* pindex = this;
+        for (int i = 0; i < nMedianTimeSpan && pindex; i++, pindex = pindex->pprev)
+            *(--pbegin) = pindex->GetBlockTime();
+
+        std::sort(pbegin, pend);
+        return pbegin[(pend - pbegin)/2];
+    }
+
+    int64_t GetMedianTime() const;
+
+    /**
+     * Returns true if there are nRequired or more blocks of minVersion or above
+     * in the last nToCheck blocks, starting at pstart and going backwards.
+     */
+    static bool IsSuperMajority(int minVersion, const CBlockIndex* pstart,
+                                unsigned int nRequired, unsigned int nToCheck);
+
+    std::string ToString() const;
+
+    void print() const
+    {
+        LogPrintf("%s\n", ToString().c_str());
+    }
+};
 /** Used to marshal pointers into hashes for db storage. */
 class CDiskBlockIndex : public CBlockIndex
 {
