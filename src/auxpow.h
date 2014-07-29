@@ -9,6 +9,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <sstream>
+#include "core.h"
 
 class CAuxPow : public CMerkleTx
 {
