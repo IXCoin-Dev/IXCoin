@@ -4,12 +4,7 @@
 #ifndef BITCOIN_AUXPOW_H
 #define BITCOIN_AUXPOW_H
 
-#include "script.h"
-#include "init.h"
-#include <vector>
-#include <boost/shared_ptr.hpp>
-#include <sstream>
-#include "core.h"
+#include "main.h"
 
 class CAuxPow : public CMerkleTx
 {
