@@ -227,10 +227,6 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
                 pindexNew->nNonce         = diskindex.nNonce;
                 pindexNew->nTx            = diskindex.nTx;
 
-                // Watch for genesis block
-                if (pindexGenesisBlock == NULL && pindexNew->GetBlockHash() == hashGenesisBlock)
-                    pindexGenesisBlock = pindexNew;
-
                 // CheckIndex needs phashBlock to be set
                 diskindex.phashBlock = pindexNew->phashBlock;
                 if (!diskindex.CheckIndex())

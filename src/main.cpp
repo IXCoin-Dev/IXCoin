@@ -2193,7 +2193,7 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     if (miPrev != mapBlockIndex.end())
     {
 		// only possible if pindexNew is not the genesis block ?!?!!?
-		assert(pindexNew->phashBlock != pindexGenesisBlock->phashBlock);
+		assert(pindexNew->phashBlock != Params().HashGenesisBlock());
         pindexNew->pprev = (*miPrev).second;	// cacheBlockIndex assignment pprev
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
     }
@@ -2649,7 +2649,7 @@ bool CDiskBlockIndex::CheckIndex() const
 std::string CBlockIndex::ToString() const
 {
     return strprintf("CBlockIndex(pprev=%p, pnext=%p, nHeight=%d, merkle=%s, hashBlock=%s)",
-            pprev, pnext, nHeight,
+            pprev, chainActive.Next(this), nHeight,
             hashMerkleRoot.ToString().substr(0,10).c_str(),
             GetBlockHash().ToString().c_str());
 }
