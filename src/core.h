@@ -7,7 +7,7 @@
 #define BITCOIN_CORE_H
 
 
-#include "auxpow.h"
+
 #include "script.h"
 #include "serialize.h"
 #include "uint256.h"

@@ -9,7 +9,6 @@
 #include "checkpoints.h"
 #include "checkqueue.h"
 #include "init.h"
-#include "auxpow.h"
 #include "main.h"
 #include "net.h"
 #include "txdb.h"
