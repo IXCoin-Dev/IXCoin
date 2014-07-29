@@ -53,6 +53,7 @@ private:
 public:
 	bool WriteDiskBlockIndex(const CDiskBlockIndex& diskblockindex);
     bool WriteBlockIndex(const CDiskBlockIndex& blockindex);
+	bool ReadDiskBlockIndex(const uint256 &blkid, CDiskBlockIndex& diskblockindex);
     bool WriteBestInvalidWork(const CBigNum& bnBestInvalidWork);
     bool ReadBlockFileInfo(int nFile, CBlockFileInfo &fileinfo);
     bool WriteBlockFileInfo(int nFile, const CBlockFileInfo &fileinfo);
