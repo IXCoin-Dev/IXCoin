@@ -733,6 +733,8 @@ Value getworkaux(const Array& params, bool fHelp)
     }
     else
     {
+        if (params[0].get_str() != "submit" && params[0].get_str() != "")
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "<aux> must be the empty string or 'submit' if work is being submitted");
         // Parse parameters
         vector<unsigned char> vchData = ParseHex(params[0].get_str());
         if (vchData.size() != 128)
