@@ -11,17 +11,13 @@
 #include "serialize.h"
 #include "uint256.h"
 #include <stdint.h>
+#include <string>
+#include <utility>
+#include <vector>
 #include <boost/shared_ptr.hpp>
-class CAuxPow;
+#include "auxpow.h"
 class CTransaction;
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
 enum BlockStatus {
     BLOCK_VALID_UNKNOWN      =    0,
     BLOCK_VALID_HEADER       =    1, // parsed, version ok, hash satisfies claimed PoW, 1 <= vtx count <= max, timestamp not in future
