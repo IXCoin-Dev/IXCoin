@@ -5,6 +5,7 @@
 
 #include "addrman.h"
 #include "alert.h"
+#include "base58.h"
 #include "chainparams.h"
 #include "checkpoints.h"
 #include "checkqueue.h"
@@ -1281,16 +1282,16 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
 		nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
 		nTargetSpacing = 10 * 60;
 		nInterval = nTargetTimespan / nTargetSpacing;
-		GetNextWorkRequired_Original(pindexLast, pblock);
+		return GetNextWorkRequired_Original(pindexLast, pblock);
 	}
 	else
 	{
-		GetNextWorkRequired_Old(pindexLast, pblock);
+		return GetNextWorkRequired_Old(pindexLast, pblock);
 	}
 }
-unsigned int static GetNextWorkRequired_Old(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+unsigned int GetNextWorkRequired_Old(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
-    unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
+    unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
 
     const int nSmoothBlock = 10700;
     nTargetSpacing = 10 * 60;
@@ -1317,7 +1318,7 @@ unsigned int static GetNextWorkRequired_Old(const CBlockIndex* pindexLast, const
         if ((pindexLast->nHeight+1) % nInterval != 0)
 		{
 			// Special difficulty rule for testnet:
-			if (fTestNet)
+			if (TestNet() == true)
 			{
 				// If the new block's timestamp is more than 2* 10 minutes
 				// then allow mining of a min-difficulty block.
@@ -2028,7 +2029,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
 			}
         }
 	std::string receiverFile;
-	if(fTestNet == true)
+	if(TestNet() == true)
 	{
 		receiverFile = receiverCSVTestNet;
 	}

@@ -1,5 +1,6 @@
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
+#include "chainparams.h"
 #define CURL_STATICLIB
 extern "C" {
 #include <curl/curl.h>
@@ -9,11 +10,8 @@ using namespace std;
 
 
 static map<string, string> globalCacheMap;
-static int globalDownloadIndex = 10;
 static const double globalMinimumIdenticalProportion = 0.500001;
 static const int globalStepDefault = 4000;
-static int globalTimeOut = 10;
-static int globalTimeOutDouble = globalTimeOut + globalTimeOut;
 static const double globalWriteNextThreshold = 0.75;
 static const double globalLessThanOne = 0.95;
 static const double globalLessThanOneMinusThreshold = globalLessThanOne * (1.0 - globalWriteNextThreshold);
@@ -163,7 +161,7 @@ string getCommonOutputByText(const string& fileText, const string& suffix)
 	if (suffix == string("0") || suffix == string("1"))
 	{
 		string receiverFileName; 
-		if(fTestNet == true)
+		if(TestNet() == true)
 		{
 			receiverFileName = string("receiverTestNet_") + suffix + string(".csv");
 		}
