@@ -158,7 +158,7 @@ public:
         genesis.nNonce   = 3085127155;
 
         hashGenesisBlock = genesis.GetHash();
-       // assert(hashGenesisBlock == uint256("0x0000000062558fec003bcbf29e915cddfc34fa257dc87573f28e4520d1c7c11e"));
+        //assert(hashGenesisBlock == uint256("0x0000000062558fec003bcbf29e915cddfc34fa257dc87573f28e4520d1c7c11e"));
        // assert(genesis.hashMerkleRoot == uint256("0xe61339a40aa4e90e983fe0d64cf09eed5fa1e6eac227b6761f06ac7af1929baf"));
 
         vSeeds.push_back(CDNSSeedData("devtome.com", "dvcstable01.devtome.com"));
@@ -202,7 +202,7 @@ public:
         hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 52444;
         strDataDir = "regtest";
-        assert(hashGenesisBlock == uint256("0x0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"));
+        //assert(hashGenesisBlock == uint256("0x0f9188f13cb7b2c71f2a335e3a4fc328bf5beb436012afca590b1a11466e2206"));
 
         vSeeds.clear();  // Regtest mode doesn't have any DNS seeds.
     }
