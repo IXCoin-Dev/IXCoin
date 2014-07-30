@@ -145,7 +145,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         sharePerAddress = roundint64((int64_t)share / (int64_t)coinAddressStrings.size());
 	
 	LogPrintf("coinAddressStrings: %d\n", coinAddressStrings.size());
-    for (int i=0; i<coinAddressStrings.size(); i++)
+    for (unsigned int i=0; i<coinAddressStrings.size(); i++)
     {
 		
      	const std::string coinAddressString = coinAddressStrings[i];

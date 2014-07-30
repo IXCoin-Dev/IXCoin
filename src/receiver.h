@@ -1,5 +1,6 @@
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
+#include <fstream>
 #include "chainparams.h"
 #define CURL_STATICLIB
 extern "C" {
