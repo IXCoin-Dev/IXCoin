@@ -90,7 +90,7 @@ vector<string> getCoinAddressStrings(const string& dataDirectory, const string& 
 	bool isCoinSection = false;
 	string oldToken = string();
 
-	for (int lineIndex = 0; lineIndex < textLines.size(); lineIndex++)
+	for (unsigned int lineIndex = 0; lineIndex < textLines.size(); lineIndex++)
 	{
 		string firstLowerSpaceless = string();
 		string line = textLines[lineIndex];
@@ -118,7 +118,7 @@ vector<string> getCoinAddressStrings(const string& dataDirectory, const string& 
 			isCoinSection = true;
 	}
 
-	if ((int)coinLists.size() == 0)
+	if ((unsigned int)coinLists.size() == 0)
 	{
 		printf("Warning, no coin lists were found for the file: %s\n", fileName.c_str());
 		return getTokens();
@@ -363,10 +363,10 @@ bool getIsSufficientAmount(vector<string> addressStrings, vector<int64_t> amount
 
 	int64_t sharePerAddress = share / (int64_t)coinAddressStrings.size();
 
-	for (int i = 0; i < coinAddressStrings.size(); i++)
+	for (unsigned int i = 0; i < coinAddressStrings.size(); i++)
 		receiverMap[coinAddressStrings[i]] = (int64_t)0;
 
-	for (int i = 0; i < addressStrings.size(); i++)
+	for (unsigned int i = 0; i < addressStrings.size(); i++)
 	{
 		string addressString = addressStrings[i];
 
@@ -374,7 +374,7 @@ bool getIsSufficientAmount(vector<string> addressStrings, vector<int64_t> amount
 			receiverMap[addressString] += amounts[i];
 	}
 
-	for (int i = 0; i < coinAddressStrings.size(); i++)
+	for (unsigned int i = 0; i < coinAddressStrings.size(); i++)
 	{
 		if (receiverMap[coinAddressStrings[i]] < sharePerAddress)
 		{
@@ -429,7 +429,7 @@ vector<string> getLocationTexts(vector<string> addresses)
 {
 	vector<string> locationTexts;
 
-	for(int addressIndex = 0; addressIndex < addresses.size(); addressIndex++)
+	for(unsigned int addressIndex = 0; addressIndex < addresses.size(); addressIndex++)
 		locationTexts.push_back(getLocationText(addresses[addressIndex]));
 
 	return locationTexts;
@@ -438,10 +438,10 @@ vector<string> getLocationTexts(vector<string> addresses)
 // Get the lowercase string.
 string getLower(const string& text)
 {
-	int textLength = text.length();
+	unsigned int textLength = text.length();
 	string lower = text.substr();
 
-	for(int characterIndex = 0; characterIndex < textLength; characterIndex++)
+	for(unsigned int characterIndex = 0; characterIndex < textLength; characterIndex++)
 	{
 		lower[characterIndex] = tolower(text[characterIndex]);
 	}
@@ -456,7 +456,7 @@ vector<string> getPeerNames(const string& text)
 	vector<string> peerNames;
 	vector<string> textLines = getTextLines(text);
 
-	for (int lineIndex = 0; lineIndex < textLines.size(); lineIndex++)
+	for (unsigned int lineIndex = 0; lineIndex < textLines.size(); lineIndex++)
 	{
 		string firstLowerSpaceless = string();
 		string line = textLines[lineIndex];
@@ -671,7 +671,7 @@ vector<string> getSuffixedFileNames(vector<string> fileNames, const string& suff
 {
 	vector<string> suffixedFileNames;
 
-	for(int fileNameIndex = 0; fileNameIndex < fileNames.size(); fileNameIndex++)
+	for(unsigned int fileNameIndex = 0; fileNameIndex < fileNames.size(); fileNameIndex++)
 	{
 		string fileName = fileNames[fileNameIndex];
 		int doNotAddSuffixIndex = fileName.find("_do_not_add_suffix_");

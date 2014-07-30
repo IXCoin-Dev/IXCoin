@@ -1241,7 +1241,7 @@ void static PruneOrphanBlocks()
 //    return nSubsidy + nFees;
 //}
 // DEVCOIN
-int64_t static GetBlockValue(int nHeight, int64_t nFees)
+int64_t GetBlockValue(int nHeight, int64_t nFees)
 {
     int64_t nSubsidy = initialSubsidy;
     return nSubsidy + nFees;
