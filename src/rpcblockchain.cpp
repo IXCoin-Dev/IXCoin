@@ -311,7 +311,7 @@ Value getblock(const Array& params, bool fHelp)
 	try
 	{
 		CBlockIndex* pblockindex = mapBlockIndex[hash];
-		block.ReadFromDisk(pblockindex);
+		ReadBlockFromDisk(block, pblockindex);
 		ret = blockToJSON(block, pblockindex); 
 	}
 
@@ -326,7 +326,7 @@ Value getblock(const Array& params, bool fHelp)
         return strHex;
     }
 
-    return blockToJSON(block, pblockindex);
+    return ret;
 }
 
 Value gettxoutsetinfo(const Array& params, bool fHelp)
