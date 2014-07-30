@@ -125,17 +125,17 @@ public:
         pchMessageStart[0] = 'd';
         pchMessageStart[1] = 'e';
         pchMessageStart[2] = 'v';
-        pchMessageStart[3] = 't';
-        vAlertPubKey = ParseHex("04302390343f91cc401d56d68b123028bf52e5fca1939df127f63c6467cdf9c8e2c14b61104cf817d0b780da337893ecc4aaff1309e536162dabbdb45200ca2b0a");
+        pchMessageStart[3] = '-';
+        vAlertPubKey = ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f");
         nDefaultPort = 53333;
         nRPCPort = 53332;
         strDataDir = "testnet3";
 
         // Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1296688602;
-        genesis.nNonce = 414098458;
+        genesis.nTime = 1311305081;
+        genesis.nNonce = 3085127155;
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943"));
+        assert(hashGenesisBlock == uint256("0x0000000062558fec003bcbf29e915cddfc34fa257dc87573f28e4520d1c7c11e"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
