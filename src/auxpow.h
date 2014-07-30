@@ -3,8 +3,15 @@
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_AUXPOW_H
 #define BITCOIN_AUXPOW_H
-
-#include "main.h"
+#include "script.h"
+#include "serialize.h"
+#include "uint256.h"
+#include <stdint.h>
+#include <vector>
+#include <boost/shared_ptr.hpp>
+class CBlockHeader;
+class CMerkleTx;
+class CTransaction;
 class CAuxPow : public CMerkleTx
 {
 public:
