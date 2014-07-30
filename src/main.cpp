@@ -1275,20 +1275,6 @@ unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime)
         bnResult = bnLimit;
     return bnResult.GetCompact();
 }
-unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
-{
-	if(pindexLast->nHeight >= 150000)
-	{
-		nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
-		nTargetSpacing = 10 * 60;
-		nInterval = nTargetTimespan / nTargetSpacing;
-		return GetNextWorkRequired_Original(pindexLast, pblock);
-	}
-	else
-	{
-		return GetNextWorkRequired_Old(pindexLast, pblock);
-	}
-}
 unsigned int GetNextWorkRequired_Old(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
@@ -1384,8 +1370,8 @@ unsigned int GetNextWorkRequired_Old(const CBlockIndex* pindexLast, const CBlock
     bnNew *= nActualTimespan;
     bnNew /= nTargetTimespan;
 
-    if (bnNew > bnProofOfWorkLimit)
-        bnNew = bnProofOfWorkLimit;
+    if (bnNew > Params().ProofOfWorkLimit())
+        bnNew = Params().ProofOfWorkLimit();
 
     /// debug print
     /*printf("GetNextWorkRequired RETARGET\n");
@@ -1456,7 +1442,20 @@ unsigned int GetNextWorkRequired_Original(const CBlockIndex* pindexLast, const C
 
     return bnNew.GetCompact();
 }
-
+unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+	if(pindexLast->nHeight >= 150000)
+	{
+		nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
+		nTargetSpacing = 10 * 60;
+		nInterval = nTargetTimespan / nTargetSpacing;
+		return GetNextWorkRequired_Original(pindexLast, pblock);
+	}
+	else
+	{
+		return GetNextWorkRequired_Old(pindexLast, pblock);
+	}
+}
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
 {
     CBigNum bnTarget;
@@ -2009,12 +2008,12 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
 	// DEVCOIN
     // Check that the required share was sent to each beneficiary
     //
-    if (vtx[0].GetValueOut() > (GetBlockValue(pindex->nHeight, nFees) - fallbackReduction))
+    if (block.vtx[0].GetValueOut() > (GetBlockValue(pindex->nHeight, nFees) - fallbackReduction))
     {
      	std::vector<std::string> addressStrings;
         std::vector<int64_t> amounts;
 
-        for (int i = 1; i < block.vtx[0].vout.size(); i++)
+        for (unsigned int i = 1; i < block.vtx[0].vout.size(); i++)
         {
 			CTxDestination txaddress;
 			if (ExtractDestination(block.vtx[0].vout[i].scriptPubKey, txaddress))
