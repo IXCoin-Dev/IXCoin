@@ -15,9 +15,48 @@
 #include <utility>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "auxpow.h"
-class CAuxPow;
 class CTransaction;
+
+class CAuxPow : public CMerkleTx
+{
+public:
+    CAuxPow(const CTransaction& txIn) : CMerkleTx(txIn)
+    {
+    }
+
+    CAuxPow() :CMerkleTx()
+    {
+    }
+
+    // Merkle branch with root vchAux
+    // root must be present inside the coinbase
+    std::vector<uint256> vChainMerkleBranch;
+    // Index of chain in chains merkle tree
+    unsigned int nChainIndex;
+    CBlockHeader parentBlockHeader;
+
+    IMPLEMENT_SERIALIZE
+    (
+        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion, ser_action);
+        nVersion = this->nVersion;
+        READWRITE(vChainMerkleBranch);
+        READWRITE(nChainIndex);
+
+        // Always serialize the saved parent block as header so that the size of CAuxPow
+        // is consistent.
+        nSerSize += SerReadWrite(s, parentBlockHeader, nType, nVersion, ser_action);
+    )
+
+    bool Check(uint256 hashAuxBlock, int nChainID);
+
+    uint256 GetParentBlockHash();
+    
+};
+
+
+
+extern void RemoveMergedMiningHeader(std::vector<unsigned char>& vchAux);
+extern CScript MakeCoinbaseWithAux(unsigned int nBits, unsigned int nExtraNonce, std::vector<unsigned char>& vchAux);
 enum
 {
 	// primary version

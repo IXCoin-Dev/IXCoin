@@ -9,7 +9,7 @@
 #include "net.h"
 #include "main.h"
 #include "miner.h"
-#include "auxpow.h"
+#include "core.h"
 #ifdef ENABLE_WALLET
 #include "db.h"
 #include "wallet.h"

@@ -14,7 +14,7 @@
 #include "txmempool.h"
 #include "ui_interface.h"
 #include "util.h"
-#include "auxpow.h"
+#include "core.h"
 #include <sstream>
 
 #include <boost/algorithm/string/replace.hpp>
