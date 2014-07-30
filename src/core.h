@@ -10,6 +10,7 @@
 #include "script.h"
 #include "serialize.h"
 #include "uint256.h"
+#include "chainparams.h"
 #include <stdint.h>
 #include <string>
 #include <utility>
