@@ -142,7 +142,7 @@ vector<string> getCoinAddressStrings(const string& dataDirectory, const string& 
 vector<string> getCommaDividedWords(const string& text)
 {
 	vector<string> commaDividedWords;
-	unsigned int commaIndex = text.find(',');
+	std::size_t commaIndex = text.find(',');
 
 	if (commaIndex == string::npos)
 	{
@@ -659,7 +659,7 @@ string getSuffixedFileName(const string& fileName, const string& suffix)
 	if (suffix == string())
 		return fileName;
 
-	unsigned int lastDotIndex = fileName.rfind(".");
+	std::size_t lastDotIndex = fileName.rfind(".");
 
 	if (lastDotIndex == string::npos)
 		return fileName + suffix;
@@ -674,7 +674,7 @@ vector<string> getSuffixedFileNames(vector<string> fileNames, const string& suff
 	for(unsigned int fileNameIndex = 0; fileNameIndex < fileNames.size(); fileNameIndex++)
 	{
 		string fileName = fileNames[fileNameIndex];
-		unsigned int doNotAddSuffixIndex = fileName.find("_do_not_add_suffix_");
+		std::size_t doNotAddSuffixIndex = fileName.find("_do_not_add_suffix_");
 
 		if (doNotAddSuffixIndex == string::npos)
 			suffixedFileNames.push_back(getSuffixedFileName(fileName, suffix));

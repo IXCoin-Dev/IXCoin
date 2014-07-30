@@ -9,6 +9,7 @@
 #include "main.h"
 #include "net.h"
 #include "core.h"
+#include "receiver.h"
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
@@ -117,9 +118,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     // Create coinbase tx
     CTransaction txNew;
     txNew.vin.resize(1);
-    txNew.vin[0].prevout.SetNull();
-    txNew.vout.resize(1);
-    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
+    txNew.vin[0].prevout.SetNull();   
 
 	// DEVCOIN
 	std::string receiverFile;
@@ -133,7 +132,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
 	}
     vector<string> coinAddressStrings = getCoinAddressStrings(GetDataDir().string(), receiverFile, (int)pindexPrev->nHeight+1, step);
     txNew.vout.resize(coinAddressStrings.size() + 1);
-    txNew.vout[0].scriptPubKey << pubkey << OP_CHECKSIG;
+    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
 	
 	// Prepare to pay beneficiaries
 
@@ -201,7 +200,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
 
     // Collect memory pool transactions into the block
-    int64_t nFees = 0;
+    nFees = 0;
     {
         LOCK2(cs_main, mempool.cs);
         
