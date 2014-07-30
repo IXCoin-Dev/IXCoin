@@ -2232,21 +2232,7 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     return true;
 }
 
-// Start accepting AUX POW at this block
-// 
-// Even if we do not accept AUX POW ourselves, we can always be the parent chain.
- 
-int GetAuxPowStartBlock()
-{
-    if (TestNet())
-        return 0; // Always on testnet
-    else
-        return 25000; // Never on prodnet
-}
-int GetOurChainID()
-{
-    return 0x0004;
-}
+
 
 bool FindBlockPos(CValidationState &state, CDiskBlockPos &pos, unsigned int nAddSize, unsigned int nHeight, uint64_t nTime, bool fKnown = false)
 {

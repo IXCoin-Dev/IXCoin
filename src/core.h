@@ -58,8 +58,21 @@ enum BlockStatus {
     BLOCK_FAILED_CHILD       =   64, // descends from failed block
     BLOCK_FAILED_MASK        =   96
 };
-
-int GetOurChainID();
+// Start accepting AUX POW at this block
+// 
+// Even if we do not accept AUX POW ourselves, we can always be the parent chain.
+ 
+inline int GetAuxPowStartBlock()
+{
+    if (TestNet())
+        return 0; // Always on testnet
+    else
+        return 25000; // Never on prodnet
+}
+inline int GetOurChainID()
+{
+    return 0x0004;
+}
 
 /** No amount larger than this (in satoshi) is valid */
 static const int64_t MAX_MONEY = (int64_t)21000000 * (int64_t)1000*COIN;

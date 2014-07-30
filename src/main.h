@@ -494,7 +494,6 @@ bool CheckBlock(const CBlock &block, CValidationState &state, int nHeight, bool 
 // Store block on disk
 // if dbp is provided, the file is known to already reside on disk
 bool AcceptBlock(CBlock& block, CValidationState& state, CDiskBlockPos* dbp = NULL);
-int GetAuxPowStartBlock();
 
 
 class CBlockFileInfo
