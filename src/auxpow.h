@@ -3,14 +3,9 @@
 // file license.txt or http://www.opensource.org/licenses/mit-license.php.
 #ifndef BITCOIN_AUXPOW_H
 #define BITCOIN_AUXPOW_H
-#include "script.h"
-#include "serialize.h"
-#include "uint256.h"
-#include <stdint.h>
-#include <vector>
-#include <boost/shared_ptr.hpp>
-#include "core.h"
+
 #include "main.h"
+class CBlockHeader;
 class CAuxPow : public CMerkleTx
 {
 public:
@@ -43,46 +38,12 @@ public:
 
     bool Check(uint256 hashAuxBlock, int nChainID);
 
-    uint256 GetParentBlockHash()
-    {
-        return parentBlockHeader.GetHash();
-    }
+    uint256 GetParentBlockHash();
+    
 };
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
-    {
-        return ::GetSerializeSize(*auxpow, nType, nVersion);
-    }
-    return 0;
-}
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
-    {
-        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
-    }
-    return 0;
-}
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW)
-    {
-		CAuxPow* newPow = new CAuxPow();
-        auxpow.reset(newPow);
-        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
-    }
-    else
-    {
-        auxpow.reset();
-        return 0;
-    }
-}
+
 extern void RemoveMergedMiningHeader(std::vector<unsigned char>& vchAux);
 extern CScript MakeCoinbaseWithAux(unsigned int nBits, unsigned int nExtraNonce, std::vector<unsigned char>& vchAux);
 #endif
