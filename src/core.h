@@ -30,41 +30,7 @@ enum
 	BLOCK_VERSION_CHAIN_START    = (1 << 16),
 	BLOCK_VERSION_CHAIN_END      = (1 << 30),
 };
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
-{
-	if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
-    {
-        return ::GetSerializeSize(*auxpow, nType, nVersion);
-    }
-    return 0;
-}
 
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
-    {
-        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
-    }
-    return 0;
-}
-
-template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action)
-{
-    if (nVersion & BLOCK_VERSION_AUXPOW)
-    {
-		CAuxPow* newPow = new CAuxPow();
-        auxpow.reset(newPow);
-        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
-    }
-    else
-    {
-        auxpow.reset();
-        return 0;
-    }
-}
 enum BlockStatus {
     BLOCK_VALID_UNKNOWN      =    0,
     BLOCK_VALID_HEADER       =    1, // parsed, version ok, hash satisfies claimed PoW, 1 <= vtx count <= max, timestamp not in future
@@ -405,6 +371,133 @@ public:
 };
 
 
+/** A transaction with a merkle branch linking it to the block chain. */
+class CMerkleTx : public CTransaction
+{
+private:
+    int GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const;
+
+public:
+    uint256 hashBlock;
+    std::vector<uint256> vMerkleBranch;
+    int nIndex;
+
+    // memory only
+    mutable bool fMerkleVerified;
+
+
+    CMerkleTx()
+    {
+        Init();
+    }
+
+    CMerkleTx(const CTransaction& txIn) : CTransaction(txIn)
+    {
+        Init();
+    }
+
+    void Init()
+    {
+        hashBlock = 0;
+        nIndex = -1;
+        fMerkleVerified = false;
+    }
+
+
+    IMPLEMENT_SERIALIZE
+    (
+        nSerSize += SerReadWrite(s, *(CTransaction*)this, nType, nVersion, ser_action);
+        nVersion = this->nVersion;
+        READWRITE(hashBlock);
+        READWRITE(vMerkleBranch);
+        READWRITE(nIndex);
+    )
+
+
+    int SetMerkleBranch(const CBlock* pblock=NULL);
+
+    // Return depth of transaction in blockchain:
+    // -1  : not in blockchain, and not in memory pool (conflicted transaction)
+    //  0  : in memory pool, waiting to be included in a block
+    // >=1 : this many blocks deep in the main chain
+    int GetDepthInMainChain(CBlockIndex* &pindexRet) const;
+    int GetDepthInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet); }
+    bool IsInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChainINTERNAL(pindexRet) > 0; }
+    int GetBlocksToMaturity() const;
+    bool AcceptToMemoryPool(bool fLimitFree=true);
+};
+
+class CAuxPow : public CMerkleTx
+{
+public:
+    CAuxPow(const CTransaction& txIn) : CMerkleTx(txIn)
+    {
+    }
+
+    CAuxPow() :CMerkleTx()
+    {
+    }
+
+    // Merkle branch with root vchAux
+    // root must be present inside the coinbase
+    std::vector<uint256> vChainMerkleBranch;
+    // Index of chain in chains merkle tree
+    unsigned int nChainIndex;
+    CBlockHeader parentBlockHeader;
+
+    IMPLEMENT_SERIALIZE
+    (
+        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion, ser_action);
+        nVersion = this->nVersion;
+        READWRITE(vChainMerkleBranch);
+        READWRITE(nChainIndex);
+
+        // Always serialize the saved parent block as header so that the size of CAuxPow
+        // is consistent.
+        nSerSize += SerReadWrite(s, parentBlockHeader, nType, nVersion, ser_action);
+    )
+
+    bool Check(uint256 hashAuxBlock, int nChainID);
+
+    uint256 GetParentBlockHash();
+    
+};
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
+{
+	if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
+    {
+        return ::GetSerializeSize(*auxpow, nType, nVersion);
+    }
+    return 0;
+}
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action)
+{
+    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
+    {
+        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
+    }
+    return 0;
+}
+
+template <typename Stream>
+int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action)
+{
+    if (nVersion & BLOCK_VERSION_AUXPOW)
+    {
+		CAuxPow* newPow = new CAuxPow();
+        auxpow.reset(newPow);
+        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
+    }
+    else
+    {
+        auxpow.reset();
+        return 0;
+    }
+}
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
  * requirements.  When they solve the proof-of-work, they broadcast the block
@@ -867,99 +960,6 @@ public:
         LogPrintf("%s\n", ToString().c_str());
     }
 };
-
-/** A transaction with a merkle branch linking it to the block chain. */
-class CMerkleTx : public CTransaction
-{
-private:
-    int GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const;
-
-public:
-    uint256 hashBlock;
-    std::vector<uint256> vMerkleBranch;
-    int nIndex;
-
-    // memory only
-    mutable bool fMerkleVerified;
-
-
-    CMerkleTx()
-    {
-        Init();
-    }
-
-    CMerkleTx(const CTransaction& txIn) : CTransaction(txIn)
-    {
-        Init();
-    }
-
-    void Init()
-    {
-        hashBlock = 0;
-        nIndex = -1;
-        fMerkleVerified = false;
-    }
-
-
-    IMPLEMENT_SERIALIZE
-    (
-        nSerSize += SerReadWrite(s, *(CTransaction*)this, nType, nVersion, ser_action);
-        nVersion = this->nVersion;
-        READWRITE(hashBlock);
-        READWRITE(vMerkleBranch);
-        READWRITE(nIndex);
-    )
-
-
-    int SetMerkleBranch(const CBlock* pblock=NULL);
-
-    // Return depth of transaction in blockchain:
-    // -1  : not in blockchain, and not in memory pool (conflicted transaction)
-    //  0  : in memory pool, waiting to be included in a block
-    // >=1 : this many blocks deep in the main chain
-    int GetDepthInMainChain(CBlockIndex* &pindexRet) const;
-    int GetDepthInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet); }
-    bool IsInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChainINTERNAL(pindexRet) > 0; }
-    int GetBlocksToMaturity() const;
-    bool AcceptToMemoryPool(bool fLimitFree=true);
-};
-
-class CAuxPow : public CMerkleTx
-{
-public:
-    CAuxPow(const CTransaction& txIn) : CMerkleTx(txIn)
-    {
-    }
-
-    CAuxPow() :CMerkleTx()
-    {
-    }
-
-    // Merkle branch with root vchAux
-    // root must be present inside the coinbase
-    std::vector<uint256> vChainMerkleBranch;
-    // Index of chain in chains merkle tree
-    unsigned int nChainIndex;
-    CBlockHeader parentBlockHeader;
-
-    IMPLEMENT_SERIALIZE
-    (
-        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion, ser_action);
-        nVersion = this->nVersion;
-        READWRITE(vChainMerkleBranch);
-        READWRITE(nChainIndex);
-
-        // Always serialize the saved parent block as header so that the size of CAuxPow
-        // is consistent.
-        nSerSize += SerReadWrite(s, parentBlockHeader, nType, nVersion, ser_action);
-    )
-
-    bool Check(uint256 hashAuxBlock, int nChainID);
-
-    uint256 GetParentBlockHash();
-    
-};
-
 
 
 extern void RemoveMergedMiningHeader(std::vector<unsigned char>& vchAux);
