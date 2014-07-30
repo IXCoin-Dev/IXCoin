@@ -1,3 +1,5 @@
+#ifndef RECEIVER_H
+#define RECEIVER_H
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
@@ -805,3 +807,4 @@ void writeNextIfValueHigher(const string& directoryPath, const string& fileName,
 			writeFileText(nextFileName, nextText);
 	}
 }
+#endif // RECEIVER_H
