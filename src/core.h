@@ -31,13 +31,40 @@ enum
 	BLOCK_VERSION_CHAIN_END      = (1 << 30),
 };
 template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
+{
+	if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
+    {
+        return ::GetSerializeSize(*auxpow, nType, nVersion);
+    }
+    return 0;
+}
 
 template <typename Stream>
-int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action);
+int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionSerialize ser_action)
+{
+    if (nVersion & BLOCK_VERSION_AUXPOW && auxpow.get() != NULL)
+    {
+        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
+    }
+    return 0;
+}
 
 template <typename Stream>
-int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action);
+int ReadWriteAuxPow(Stream& s, boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionUnserialize ser_action)
+{
+    if (nVersion & BLOCK_VERSION_AUXPOW)
+    {
+		CAuxPow* newPow = new CAuxPow();
+        auxpow.reset(newPow);
+        return SerReadWrite(s, *auxpow, nType, nVersion, ser_action);
+    }
+    else
+    {
+        auxpow.reset();
+        return 0;
+    }
+}
 enum BlockStatus {
     BLOCK_VALID_UNKNOWN      =    0,
     BLOCK_VALID_HEADER       =    1, // parsed, version ok, hash satisfies claimed PoW, 1 <= vtx count <= max, timestamp not in future
