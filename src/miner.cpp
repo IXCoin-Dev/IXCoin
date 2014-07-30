@@ -9,7 +9,7 @@
 #include "main.h"
 #include "net.h"
 #include "core.h"
-#include "receiver.h"
+
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
