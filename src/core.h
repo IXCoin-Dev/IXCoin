@@ -43,18 +43,7 @@ enum BlockStatus {
     BLOCK_FAILED_CHILD       =   64, // descends from failed block
     BLOCK_FAILED_MASK        =   96
 };
-enum
-{
-	// primary version
-	BLOCK_VERSION_DEFAULT        = (1 << 0),
 
-	// modifiers
-	BLOCK_VERSION_AUXPOW         = (1 << 8),
-
-	// bits allocated for chain ID
-	BLOCK_VERSION_CHAIN_START    = (1 << 16),
-	BLOCK_VERSION_CHAIN_END      = (1 << 30),
-};
 int GetOurChainID();
 
 /** No amount larger than this (in satoshi) is valid */

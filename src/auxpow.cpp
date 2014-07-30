@@ -18,7 +18,10 @@ void RemoveMergedMiningHeader(vector<unsigned char>& vchAux)
         throw runtime_error("merged mining aux too short");
     vchAux.erase(vchAux.begin(), vchAux.begin() + sizeof(pchMergedMiningHeader));
 }
-
+uint256 CAuxPow::GetParentBlockHash()
+{
+    return parentBlockHeader.GetHash();
+}
 bool CAuxPow::Check(uint256 hashAuxBlock, int nChainID)
 {
     if (nIndex != 0)

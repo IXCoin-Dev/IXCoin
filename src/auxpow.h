@@ -14,6 +14,18 @@ const class CMerkleTx;
 class CTransaction;
 class CBlock;
 class CBlockIndex;
+enum
+{
+	// primary version
+	BLOCK_VERSION_DEFAULT        = (1 << 0),
+
+	// modifiers
+	BLOCK_VERSION_AUXPOW         = (1 << 8),
+
+	// bits allocated for chain ID
+	BLOCK_VERSION_CHAIN_START    = (1 << 16),
+	BLOCK_VERSION_CHAIN_END      = (1 << 30),
+};
 class CAuxPow : public CMerkleTx
 {
 public:
@@ -46,10 +58,7 @@ public:
 
     bool Check(uint256 hashAuxBlock, int nChainID);
 
-    uint256 GetParentBlockHash()
-    {
-        return parentBlockHeader.GetHash();
-    }
+    uint256 GetParentBlockHash();
 };
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action)
