@@ -17,46 +17,7 @@
 #include <boost/shared_ptr.hpp>
 class CTransaction;
 
-class CAuxPow : public CMerkleTx
-{
-public:
-    CAuxPow(const CTransaction& txIn) : CMerkleTx(txIn)
-    {
-    }
 
-    CAuxPow() :CMerkleTx()
-    {
-    }
-
-    // Merkle branch with root vchAux
-    // root must be present inside the coinbase
-    std::vector<uint256> vChainMerkleBranch;
-    // Index of chain in chains merkle tree
-    unsigned int nChainIndex;
-    CBlockHeader parentBlockHeader;
-
-    IMPLEMENT_SERIALIZE
-    (
-        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion, ser_action);
-        nVersion = this->nVersion;
-        READWRITE(vChainMerkleBranch);
-        READWRITE(nChainIndex);
-
-        // Always serialize the saved parent block as header so that the size of CAuxPow
-        // is consistent.
-        nSerSize += SerReadWrite(s, parentBlockHeader, nType, nVersion, ser_action);
-    )
-
-    bool Check(uint256 hashAuxBlock, int nChainID);
-
-    uint256 GetParentBlockHash();
-    
-};
-
-
-
-extern void RemoveMergedMiningHeader(std::vector<unsigned char>& vchAux);
-extern CScript MakeCoinbaseWithAux(unsigned int nBits, unsigned int nExtraNonce, std::vector<unsigned char>& vchAux);
 enum
 {
 	// primary version
@@ -906,4 +867,102 @@ public:
         LogPrintf("%s\n", ToString().c_str());
     }
 };
+
+/** A transaction with a merkle branch linking it to the block chain. */
+class CMerkleTx : public CTransaction
+{
+private:
+    int GetDepthInMainChainINTERNAL(CBlockIndex* &pindexRet) const;
+
+public:
+    uint256 hashBlock;
+    std::vector<uint256> vMerkleBranch;
+    int nIndex;
+
+    // memory only
+    mutable bool fMerkleVerified;
+
+
+    CMerkleTx()
+    {
+        Init();
+    }
+
+    CMerkleTx(const CTransaction& txIn) : CTransaction(txIn)
+    {
+        Init();
+    }
+
+    void Init()
+    {
+        hashBlock = 0;
+        nIndex = -1;
+        fMerkleVerified = false;
+    }
+
+
+    IMPLEMENT_SERIALIZE
+    (
+        nSerSize += SerReadWrite(s, *(CTransaction*)this, nType, nVersion, ser_action);
+        nVersion = this->nVersion;
+        READWRITE(hashBlock);
+        READWRITE(vMerkleBranch);
+        READWRITE(nIndex);
+    )
+
+
+    int SetMerkleBranch(const CBlock* pblock=NULL);
+
+    // Return depth of transaction in blockchain:
+    // -1  : not in blockchain, and not in memory pool (conflicted transaction)
+    //  0  : in memory pool, waiting to be included in a block
+    // >=1 : this many blocks deep in the main chain
+    int GetDepthInMainChain(CBlockIndex* &pindexRet) const;
+    int GetDepthInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChain(pindexRet); }
+    bool IsInMainChain() const { CBlockIndex *pindexRet; return GetDepthInMainChainINTERNAL(pindexRet) > 0; }
+    int GetBlocksToMaturity() const;
+    bool AcceptToMemoryPool(bool fLimitFree=true);
+};
+
+class CAuxPow : public CMerkleTx
+{
+public:
+    CAuxPow(const CTransaction& txIn) : CMerkleTx(txIn)
+    {
+    }
+
+    CAuxPow() :CMerkleTx()
+    {
+    }
+
+    // Merkle branch with root vchAux
+    // root must be present inside the coinbase
+    std::vector<uint256> vChainMerkleBranch;
+    // Index of chain in chains merkle tree
+    unsigned int nChainIndex;
+    CBlockHeader parentBlockHeader;
+
+    IMPLEMENT_SERIALIZE
+    (
+        nSerSize += SerReadWrite(s, *(CMerkleTx*)this, nType, nVersion, ser_action);
+        nVersion = this->nVersion;
+        READWRITE(vChainMerkleBranch);
+        READWRITE(nChainIndex);
+
+        // Always serialize the saved parent block as header so that the size of CAuxPow
+        // is consistent.
+        nSerSize += SerReadWrite(s, parentBlockHeader, nType, nVersion, ser_action);
+    )
+
+    bool Check(uint256 hashAuxBlock, int nChainID);
+
+    uint256 GetParentBlockHash();
+    
+};
+
+
+
+extern void RemoveMergedMiningHeader(std::vector<unsigned char>& vchAux);
+extern CScript MakeCoinbaseWithAux(unsigned int nBits, unsigned int nExtraNonce, std::vector<unsigned char>& vchAux);
+
 #endif
