@@ -5,7 +5,7 @@
 #include "init.h"
 #include "main.h"
 #include "auxpow.h"
-
+#include "core.h"
 
 using namespace std;
 using namespace boost;

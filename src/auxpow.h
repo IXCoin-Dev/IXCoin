@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-
+class CBlockHeader;
 const class CMerkleTx;
 class CTransaction;
 class CBlock;
