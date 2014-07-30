@@ -16,7 +16,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 class CTransaction;
-
+class CBlockHeader;
 
 enum
 {
