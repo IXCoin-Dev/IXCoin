@@ -142,7 +142,7 @@ vector<string> getCoinAddressStrings(const string& dataDirectory, const string& 
 vector<string> getCommaDividedWords(const string& text)
 {
 	vector<string> commaDividedWords;
-	int commaIndex = text.find(',');
+	unsigned int commaIndex = text.find(',');
 
 	if (commaIndex == string::npos)
 	{
@@ -386,17 +386,17 @@ bool getIsSufficientAmount(vector<string> addressStrings, vector<int64_t> amount
 			cout << "The expected addresses are:" << endl;
 			cout << "The receiverMap shows that they should get " << receiverMap[coinAddressStrings[i]] << " coins" << endl;
 			cout << "The shares per address however are set to " << sharePerAddress << endl;
-			for (int i = 0; i < coinAddressStrings.size(); i++)
+			for (unsigned int i = 0; i < coinAddressStrings.size(); i++)
 				cout << coinAddressStrings[i] << endl;
 
 			cout << endl << "The given addresses are:" << endl;
 
-			for (int i = 0; i < addressStrings.size(); i++)
+			for (unsigned int i = 0; i < addressStrings.size(); i++)
 				cout << addressStrings[i] << endl;
 
 			cout << endl << "The given amounts are:" << endl;
 
-			for (int i = 0; i < amounts.size(); i++)
+			for (unsigned int i = 0; i < amounts.size(); i++)
 				cout << amounts[i] << endl;
 
 			cout << endl;
@@ -659,7 +659,7 @@ string getSuffixedFileName(const string& fileName, const string& suffix)
 	if (suffix == string())
 		return fileName;
 
-	int lastDotIndex = fileName.rfind(".");
+	unsigned int lastDotIndex = fileName.rfind(".");
 
 	if (lastDotIndex == string::npos)
 		return fileName + suffix;
@@ -674,7 +674,7 @@ vector<string> getSuffixedFileNames(vector<string> fileNames, const string& suff
 	for(unsigned int fileNameIndex = 0; fileNameIndex < fileNames.size(); fileNameIndex++)
 	{
 		string fileName = fileNames[fileNameIndex];
-		int doNotAddSuffixIndex = fileName.find("_do_not_add_suffix_");
+		unsigned int doNotAddSuffixIndex = fileName.find("_do_not_add_suffix_");
 
 		if (doNotAddSuffixIndex == string::npos)
 			suffixedFileNames.push_back(getSuffixedFileName(fileName, suffix));

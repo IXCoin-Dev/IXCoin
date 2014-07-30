@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "miner.h"
-
+#include "base58.h"
 #include "core.h"
 #include "main.h"
 #include "net.h"
@@ -165,7 +165,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
 			txNew.vout[i + 1].nValue = sharePerAddress;
 			
 			minerValue -= sharePerAddress;
-			LogPrintf("Address %s valid, value %"PRI64d", minerValue %"PRI64d"\n", coinAddressString.c_str(), txNew.vout[i + 1].nValue, minerValue);
+			LogPrintf("Address %s valid, value %d, minerValue %d\n", coinAddressString.c_str(), txNew.vout[i + 1].nValue, minerValue);
 			
 		}
 		else
@@ -174,7 +174,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
 		}
 		if(txNew.vout[i + 1].nValue < 0)
 		{
-			LogPrintf("negative vout value:  %"PRI64d"\n", txNew.vout[i + 1].nValue);
+			LogPrintf("negative vout value:  %d\n", txNew.vout[i + 1].nValue);
 			txNew.vout[i + 1].nValue = 0;
 		}
     }
