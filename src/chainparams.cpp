@@ -29,10 +29,10 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart[0] = 'd';
-        pchMessageStart[1] = 'e';
-        pchMessageStart[2] = 'v';
-        pchMessageStart[3] = '-';
+        pchMessageStart[0] = 'D';
+        pchMessageStart[1] = 'E';
+        pchMessageStart[2] = 'V';
+		pchMessageStart[3] = ':';
         vAlertPubKey = ParseHex("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
         nDefaultPort = 52333;
         nRPCPort = 52332;
