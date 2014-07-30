@@ -98,27 +98,53 @@ string HTTPReply(int nStatus, const string& strMsg, bool keepalive)
         strMsg);
 }
 
+int GetPostIndex(const vector<string>& vWords)
+{
+	if (vWords[0] == "GET" || vWords[0] == "POST")
+		return 0;
+	if (vWords[1] == "GET" || vWords[1] == "POST")
+		return 1;
+	return -1;
+}
+int GetURIIndex(const vector<string>& vWords)
+{
+	if (vWords[0].size() > 0 && vWords[0][0] == '/')
+		return 0;
+	if (vWords[1].size() > 0 && vWords[1][0] == '/')
+		return 1;
+	return -1;
+}
 bool ReadHTTPRequestLine(std::basic_istream<char>& stream, int &proto,
                          string& http_method, string& http_uri)
 {
     string str;
     getline(stream, str);
-
     // HTTP request line is space-delimited
     vector<string> vWords;
     boost::split(vWords, str, boost::is_any_of(" "));
     if (vWords.size() < 2)
+	{
+		
         return false;
+	}
 
     // HTTP methods permitted: GET, POST
-    http_method = vWords[0];
-    if (http_method != "GET" && http_method != "POST")
-        return false;
+	int postIndex = GetPostIndex(vWords);
+	if(postIndex < 0)
+	{
+		printf("ReadHTTPRequestLine GetPostIndex FAIL\n");
+		return false;
+	}
+    http_method = vWords[postIndex];
 
+	int URIIndex = GetURIIndex(vWords);
+	if(URIIndex < 0)
+	{
+		printf("ReadHTTPRequestLine GetURIIndex FAIL\n");
+		return false;
+	}
     // HTTP URI must be an absolute path, relative to current host
-    http_uri = vWords[1];
-    if (http_uri.size() == 0 || http_uri[0] != '/')
-        return false;
+    http_uri = vWords[URIIndex];
 
     // parse proto, if present
     string strProto = "";
@@ -129,7 +155,6 @@ bool ReadHTTPRequestLine(std::basic_istream<char>& stream, int &proto,
     const char *ver = strstr(strProto.c_str(), "HTTP/1.");
     if (ver != NULL)
         proto = atoi(ver+7);
-
     return true;
 }
 

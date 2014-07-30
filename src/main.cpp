@@ -21,6 +21,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
 #include <boost/shared_ptr.hpp>
+#include "receiver.h"
 using namespace std;
 using namespace boost;
 
@@ -48,9 +49,10 @@ bool fTxIndex = false;
 unsigned int nCoinCacheSize = 5000;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
-int64_t CTransaction::nMinTxFee = 10000;  // Override with -mintxfee
+int64_t CTransaction::nMinTxFee = 10000*1000;  // Override with -mintxfee
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying and mining) */
-int64_t CTransaction::nMinRelayTxFee = 1000;
+int64_t CTransaction::nMinRelayTxFee = 1000*1000;
+
 
 struct COrphanBlock {
     uint256 hashBlock;
@@ -1223,24 +1225,29 @@ void static PruneOrphanBlocks()
     mapOrphanBlocks.erase(hash);
 }
 
-int64_t GetBlockValue(int nHeight, int64_t nFees)
+//int64_t GetBlockValue(int nHeight, int64_t nFees)
+//{
+//    int64_t nSubsidy = 50 * COIN;
+//    int halvings = nHeight / Params().SubsidyHalvingInterval();
+//
+//    // Force block reward to zero when right shift is undefined.
+//    if (halvings >= 64)
+//        return nFees;
+//
+//    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
+//    nSubsidy >>= halvings;
+//
+//    return nSubsidy + nFees;
+//}
+// DEVCOIN
+int64_t static GetBlockValue(int nHeight, int64_t nFees)
 {
-    int64_t nSubsidy = 50 * COIN;
-    int halvings = nHeight / Params().SubsidyHalvingInterval();
-
-    // Force block reward to zero when right shift is undefined.
-    if (halvings >= 64)
-        return nFees;
-
-    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-    nSubsidy >>= halvings;
-
+    int64_t nSubsidy = initialSubsidy;
     return nSubsidy + nFees;
 }
-
-static const int64_t nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
-static const int64_t nTargetSpacing = 10 * 60;
-static const int64_t nInterval = nTargetTimespan / nTargetSpacing;
+static int64_t nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
+static int64_t nTargetSpacing = 10 * 60;
+static int64_t nInterval = nTargetTimespan / nTargetSpacing;
 
 //
 // minimum amount of work that could possibly be required nTime after
@@ -1267,8 +1274,127 @@ unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime)
         bnResult = bnLimit;
     return bnResult.GetCompact();
 }
-
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+	if(pindexLast->nHeight >= 150000)
+	{
+		nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
+		nTargetSpacing = 10 * 60;
+		nInterval = nTargetTimespan / nTargetSpacing;
+		GetNextWorkRequired_Original(pindexLast, pblock);
+	}
+	else
+	{
+		GetNextWorkRequired_Old(pindexLast, pblock);
+	}
+}
+unsigned int static GetNextWorkRequired_Old(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
+{
+    unsigned int nProofOfWorkLimit = bnProofOfWorkLimit.GetCompact();
+
+    const int nSmoothBlock = 10700;
+    nTargetSpacing = 10 * 60;
+    nTargetTimespan = 24 * 60 * 60; // one day
+
+    if (pindexLast->nHeight < nSmoothBlock)
+        nTargetTimespan *= 14; // two weeks
+
+    nInterval = nTargetTimespan / nTargetSpacing;
+
+    // Genesis block
+    if (pindexLast == NULL)
+        return nProofOfWorkLimit;
+
+    const int nMedianBlock = 10800;
+    int64_t nIntervalMinusOne = nInterval-1;
+
+    if (pindexLast->nHeight < 10)
+        return pindexLast->nBits;
+
+
+    // Change at each block after nSmoothBlock
+    if (pindexLast->nHeight < nSmoothBlock)
+        if ((pindexLast->nHeight+1) % nInterval != 0)
+		{
+			// Special difficulty rule for testnet:
+			if (fTestNet)
+			{
+				// If the new block's timestamp is more than 2* 10 minutes
+				// then allow mining of a min-difficulty block.
+				if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
+					return nProofOfWorkLimit;
+				else
+				{
+					// Return the last non-special-min-difficulty-rules-block
+					const CBlockIndex* pindex = pindexLast;
+					while (pindex->pprev && pindex->nHeight % nInterval != 0 && pindex->nBits == nProofOfWorkLimit)
+						pindex = pindex->pprev;
+					return pindex->nBits;
+				}
+			}
+            return pindexLast->nBits;
+		}
+
+    // Go back by what we want to be one day worth of blocks
+    const CBlockIndex* pindexFirst = pindexLast;
+    vector<int64_t> blockTimes;
+    CBigNum averageBits;
+    averageBits.SetCompact(0);
+
+    for (int i = 0; pindexFirst && i < nIntervalMinusOne; i++)
+    {
+        averageBits += CBigNum().SetCompact(pindexFirst->nBits);
+        blockTimes.push_back(pindexFirst->GetBlockTime());
+        pindexFirst = pindexFirst->pprev;
+    }
+
+    assert(pindexFirst);
+    int blockTimeEndIndex = blockTimes.size() - 6;
+    sort(blockTimes.begin(), blockTimes.end());
+    averageBits /= nIntervalMinusOne;
+
+    // Limit adjustment step
+    int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
+    int64_t nMedianTimespan = blockTimes[blockTimeEndIndex] - blockTimes[6];
+    nMedianTimespan *= nIntervalMinusOne / (int64_t)(blockTimeEndIndex - 6);
+
+    // Change nActualTimespan after nMedianBlock
+    if (pindexLast->nHeight > nMedianBlock)
+    {
+        nActualTimespan = nMedianTimespan;
+    }
+
+  //  printf(" nActualTimespan = %"PRI64d" before bounds\n", nActualTimespan);
+
+    if (nActualTimespan < nTargetTimespan/4)
+        nActualTimespan = nTargetTimespan/4;
+
+    if (nActualTimespan > nTargetTimespan*4)
+        nActualTimespan = nTargetTimespan*4;
+
+    // Retarget
+    CBigNum bnNew;
+    bnNew.SetCompact(pindexLast->nBits);
+
+    // Change bnNew after nMedianBlock
+    if (pindexLast->nHeight > nMedianBlock)
+        bnNew = averageBits;
+
+    bnNew *= nActualTimespan;
+    bnNew /= nTargetTimespan;
+
+    if (bnNew > bnProofOfWorkLimit)
+        bnNew = bnProofOfWorkLimit;
+
+    /// debug print
+    /*printf("GetNextWorkRequired RETARGET\n");
+    printf("nTargetTimespan = %"PRI64d" nActualTimespan = %"PRI64d"\n", nTargetTimespan, nActualTimespan);
+    printf("Before: %08x %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
+    printf("After: %08x %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());*/
+
+    return bnNew.GetCompact();
+}
+unsigned int GetNextWorkRequired_Original(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
     unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
 
@@ -1878,6 +2004,43 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
                                block.vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees)),
                                REJECT_INVALID, "bad-cb-amount");
 
+
+	// DEVCOIN
+    // Check that the required share was sent to each beneficiary
+    //
+    if (vtx[0].GetValueOut() > (GetBlockValue(pindex->nHeight, nFees) - fallbackReduction))
+    {
+     	std::vector<std::string> addressStrings;
+        std::vector<int64_t> amounts;
+
+        for (int i = 1; i < vtx[0].vout.size(); i++)
+        {
+			CTxDestination txaddress;
+			if (ExtractDestination(vtx[0].vout[i].scriptPubKey, txaddress))
+			{
+				
+				CBitcoinAddress addr(txaddress);
+				if (addr.IsValid())
+				{
+					addressStrings.push_back(addr.ToString());
+					amounts.push_back(vtx[0].vout[i].nValue);
+				}
+			}
+        }
+	std::string receiverFile;
+	if(fTestNet == true)
+	{
+		receiverFile = receiverCSVTestNet;
+	}
+	else
+	{
+		receiverFile = receiverCSV;
+	}
+	if (!getIsSufficientAmount(addressStrings, amounts, GetDataDir().string(), receiverFile, (int)pindex->nHeight, share, step))
+            return error("ConnectBlock() : Share to beneficiary is insufficient");
+    }
+
+	// END DEVCOIN
     if (!control.Wait())
         return state.DoS(100, false);
     int64_t nTime2 = GetTimeMicros() - nStart;

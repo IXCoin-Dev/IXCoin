@@ -12,6 +12,7 @@
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // BitcoinMiner
@@ -112,13 +113,72 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     if(!pblocktemplate.get())
         return NULL;
     CBlock *pblock = &pblocktemplate->block; // pointer for convenience
-
+	CBlockIndex* pindexPrev = chainActive.Tip();
     // Create coinbase tx
     CTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
     txNew.vout[0].scriptPubKey = scriptPubKeyIn;
+
+	// DEVCOIN
+	std::string receiverFile;
+	if(TestNet() == true)
+	{
+		receiverFile = receiverCSVTestNet;
+	}
+	else
+	{
+		receiverFile = receiverCSV;
+	}
+    vector<string> coinAddressStrings = getCoinAddressStrings(GetDataDir().string(), receiverFile, (int)pindexPrev->nHeight+1, step);
+    txNew.vout.resize(coinAddressStrings.size() + 1);
+    txNew.vout[0].scriptPubKey << pubkey << OP_CHECKSIG;
+	
+	// Prepare to pay beneficiaries
+
+    int64_t nFees = 0;
+    int64_t minerValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+    int64_t sharePerAddress = 0;
+    if (coinAddressStrings.size() == 0)
+        minerValue -= fallbackReduction;
+    else
+        sharePerAddress = roundint64((int64_t)share / (int64_t)coinAddressStrings.size());
+	
+	LogPrintf("coinAddressStrings: %d\n", coinAddressStrings.size());
+    for (int i=0; i<coinAddressStrings.size(); i++)
+    {
+		
+     	const std::string coinAddressString = coinAddressStrings[i];
+        // Create transaction
+        CKeyID addrKeyId;
+		CBitcoinAddress addr(coinAddressString);
+		if(!addr.IsValid())
+		{
+			LogPrintf("CBitcoinAddress not valid! %s\n", coinAddressString.c_str());
+			return NULL;
+		}
+		
+		if(addr.GetKeyID(addrKeyId))
+		{
+			txNew.vout[i + 1].scriptPubKey << OP_DUP << OP_HASH160 << addrKeyId << OP_EQUALVERIFY << OP_CHECKSIG;
+			txNew.vout[i + 1].nValue = sharePerAddress;
+			
+			minerValue -= sharePerAddress;
+			LogPrintf("Address %s valid, value %"PRI64d", minerValue %"PRI64d"\n", coinAddressString.c_str(), txNew.vout[i + 1].nValue, minerValue);
+			
+		}
+		else
+		{
+			LogPrintf("Address key invalid for: %s\n", coinAddressString.c_str());
+		}
+		if(txNew.vout[i + 1].nValue < 0)
+		{
+			LogPrintf("negative vout value:  %"PRI64d"\n", txNew.vout[i + 1].nValue);
+			txNew.vout[i + 1].nValue = 0;
+		}
+    }
+	// END DEVCOIN
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -144,7 +204,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     int64_t nFees = 0;
     {
         LOCK2(cs_main, mempool.cs);
-        CBlockIndex* pindexPrev = chainActive.Tip();
+        
         CCoinsViewCache view(*pcoinsTip, true);
 
         // Priority order to process transactions
@@ -322,7 +382,9 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         nLastBlockSize = nBlockSize;
         LogPrintf("CreateNewBlock(): total size %u\n", nBlockSize);
 
-        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+        //pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
+		// DEVCOIN
+		pblock->vtx[0].vout[0].nValue = minerValue + nFees;
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header
