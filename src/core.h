@@ -16,7 +16,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "auxpow.h"
-class CAuxPow;
+
 class CTransaction;
 template <typename Stream>
 int ReadWriteAuxPow(Stream& s, const boost::shared_ptr<CAuxPow>& auxpow, int nType, int nVersion, CSerActionGetSerializeSize ser_action);

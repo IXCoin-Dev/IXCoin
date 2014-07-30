@@ -13,7 +13,6 @@
 #include "bignum.h"
 #include "chainparams.h"
 #include "coins.h"
-#include "core.h"
 #include "net.h"
 #include "script.h"
 #include "sync.h"
