@@ -2014,17 +2014,17 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
      	std::vector<std::string> addressStrings;
         std::vector<int64_t> amounts;
 
-        for (int i = 1; i < vtx[0].vout.size(); i++)
+        for (int i = 1; i < block.vtx[0].vout.size(); i++)
         {
 			CTxDestination txaddress;
-			if (ExtractDestination(vtx[0].vout[i].scriptPubKey, txaddress))
+			if (ExtractDestination(block.vtx[0].vout[i].scriptPubKey, txaddress))
 			{
 				
 				CBitcoinAddress addr(txaddress);
 				if (addr.IsValid())
 				{
 					addressStrings.push_back(addr.ToString());
-					amounts.push_back(vtx[0].vout[i].nValue);
+					amounts.push_back(block.vtx[0].vout[i].nValue);
 				}
 			}
         }
