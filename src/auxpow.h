@@ -10,8 +10,10 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 class CBlockHeader;
-class CMerkleTx;
+const class CMerkleTx;
 class CTransaction;
+class CBlock;
+class CBlockIndex;
 class CAuxPow : public CMerkleTx
 {
 public:
