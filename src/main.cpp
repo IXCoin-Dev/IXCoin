@@ -1246,7 +1246,7 @@ int64_t GetBlockValue(int nHeight, int64_t nFees)
     int64_t nSubsidy = initialSubsidy;
     return nSubsidy + nFees;
 }
-static int64_t nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
+static int64_t nTargetTimespan = 24 * 60 * 60; // one day
 static int64_t nTargetSpacing = 10 * 60;
 static int64_t nInterval = nTargetTimespan / nTargetSpacing;
 
