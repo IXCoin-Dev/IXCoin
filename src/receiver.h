@@ -19,8 +19,8 @@ static const double globalWriteNextThreshold = 0.75;
 static const double globalLessThanOne = 0.95;
 static const double globalLessThanOneMinusThreshold = globalLessThanOne * (1.0 - globalWriteNextThreshold);
 
-/*
-static size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* userp);
+
+size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* userp);
 string getCachedText(const string& fileName);
 vector<string> getCoinAddressStrings(const string& dataDirectory, const string& fileName, int height, int step=globalStepDefault);
 vector<string> getCommaDividedWords(const string& text);
@@ -58,7 +58,7 @@ void makeDirectory(const string& directoryPath);
 void writeFileText(const string& fileName, const string& fileText);
 void writeFileTextByDirectory(const string& directoryPath, const string& fileName, const string& fileText);
 void writeNextIfValueHigher(const string& directoryPath, const string& fileName, int height, int step, const string& stepText);
-*/
+
 
 // Callback function writes data to a std::ostream.
 inline size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* userp)
