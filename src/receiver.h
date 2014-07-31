@@ -19,7 +19,7 @@ static const double globalWriteNextThreshold = 0.75;
 static const double globalLessThanOne = 0.95;
 static const double globalLessThanOneMinusThreshold = globalLessThanOne * (1.0 - globalWriteNextThreshold);
 
-
+/*
 static size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* userp);
 string getCachedText(const string& fileName);
 vector<string> getCoinAddressStrings(const string& dataDirectory, const string& fileName, int height, int step=globalStepDefault);
@@ -58,10 +58,10 @@ void makeDirectory(const string& directoryPath);
 void writeFileText(const string& fileName, const string& fileText);
 void writeFileTextByDirectory(const string& directoryPath, const string& fileName, const string& fileText);
 void writeNextIfValueHigher(const string& directoryPath, const string& fileName, int height, int step, const string& stepText);
-
+*/
 
 // Callback function writes data to a std::ostream.
-static size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* userp)
+inline size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* userp)
 {
 	if(userp)
 	{
@@ -76,7 +76,7 @@ static size_t curlWriteFunction(void* buf, size_t size, size_t nmemb, void* user
 }
 
 // Get the cached text or read it from a file.
-string getCachedText(const string& fileName)
+inline string getCachedText(const string& fileName)
 {
 	if (globalCacheMap.count(fileName) == 0)
 		globalCacheMap[fileName] = getFileText(fileName);
@@ -85,7 +85,7 @@ string getCachedText(const string& fileName)
 }
 
 // Get the coin address strings for a height.
-vector<string> getCoinAddressStrings(const string& dataDirectory, const string& fileName, int height, int step)
+inline vector<string> getCoinAddressStrings(const string& dataDirectory, const string& fileName, int height, int step)
 {
 	vector<string> coinList;
 	vector<vector<string> > coinLists;
@@ -142,7 +142,7 @@ vector<string> getCoinAddressStrings(const string& dataDirectory, const string& 
 }
 
 // Get the words divided around the comma.
-vector<string> getCommaDividedWords(const string& text)
+inline vector<string> getCommaDividedWords(const string& text)
 {
 	vector<string> commaDividedWords;
 	std::size_t commaIndex = text.find(',');
@@ -159,7 +159,7 @@ vector<string> getCommaDividedWords(const string& text)
 }
 
 // Get the common output according to the peers listed in a text.
-string getCommonOutputByText(const string& fileText, const string& suffix)
+inline string getCommonOutputByText(const string& fileText, const string& suffix)
 {
 	if (suffix == string("0") || suffix == string("1"))
 	{
@@ -213,7 +213,7 @@ string getCommonOutputByText(const string& fileText, const string& suffix)
 }
 
 // Get the vector of directory names of the given directory.
-vector<string> getDirectoryNames(const string& directoryName)
+inline vector<string> getDirectoryNames(const string& directoryName)
 {
 	vector<string> directoryNames;
 
@@ -235,7 +235,7 @@ vector<string> getDirectoryNames(const string& directoryName)
 }
 
 // Get the directory name of the given file.
-string getDirectoryPath(const string& fileName)
+inline string getDirectoryPath(const string& fileName)
 {
 	string directoryPath = (filesystem::path(fileName)).parent_path().string();
 	if (directoryPath == string())
@@ -244,7 +244,7 @@ string getDirectoryPath(const string& fileName)
 }
 
 // Get a double precision float from a string.
-double getDouble(const string& doubleString)
+inline double getDouble(const string& doubleString)
 {
 	double doublePrecision;
 	istringstream doubleStream(doubleString);
@@ -254,13 +254,13 @@ double getDouble(const string& doubleString)
 }
 
 // Determine if the file exists.
-bool getExists(const string& fileName)
+inline bool getExists(const string& fileName)
 {
 	return filesystem::exists(fileName);
 }
 
 // Get the random number from a file random_number in the same directory as the given file.
-double getFileRandomNumber(const string& dataDirectory, const string& fileName)
+inline double getFileRandomNumber(const string& dataDirectory, const string& fileName)
 {
 	string directoryPath = dataDirectory.substr();
 	if (dataDirectory == string())
@@ -280,7 +280,7 @@ double getFileRandomNumber(const string& dataDirectory, const string& fileName)
 }
 
 // Get the entire text of a file.
-string getFileText(const string& fileName)
+inline string getFileText(const string& fileName)
 {
 	ifstream fileStream(fileName.c_str());
 
@@ -297,7 +297,7 @@ string getFileText(const string& fileName)
 }
 
 // Get the entire text of an https page.
-string getHttpsText(const string& address)
+inline string getHttpsText(const string& address)
 {
 
 	CURL *curl;
@@ -334,7 +334,7 @@ string getHttpsText(const string& address)
 }
 
 // Get an integer from a string.
-int getInt(const string& integerString)
+inline int getInt(const string& integerString)
 {
 	try
 	{
@@ -353,7 +353,7 @@ int getInt(const string& integerString)
 }
 
 // Determine if the transactions add up to a share per address for each address.
-bool getIsSufficientAmount(vector<string> addressStrings, vector<int64_t> amounts, const string& dataDirectory, const string& fileName, int height, int64_t share, int step)
+inline bool getIsSufficientAmount(vector<string> addressStrings, vector<int64_t> amounts, const string& dataDirectory, const string& fileName, int height, int64_t share, int step)
 {
 	vector<string> coinAddressStrings = getCoinAddressStrings(dataDirectory, fileName, height, step);
 	map<string, int64_t> receiverMap;
@@ -411,14 +411,14 @@ bool getIsSufficientAmount(vector<string> addressStrings, vector<int64_t> amount
 }
 
 // Get the directory path joined with the file name.
-string getJoinedPath(const string& directoryPath, const string& fileName)
+inline string getJoinedPath(const string& directoryPath, const string& fileName)
 {
 	filesystem::path completePath = filesystem::system_complete(filesystem::path(directoryPath));
 	return (completePath / (filesystem::path(fileName))).string();
 }
 
 // Get the page by the address, be it a file name or hypertext address.
-string getLocationText(const string& address)
+inline string getLocationText(const string& address)
 {
 
   if (getStartsWith(address, string("https://")) || getStartsWith(address, string("http://")))
@@ -428,7 +428,7 @@ string getLocationText(const string& address)
 }
 
 // Get the pages by the addresses, be they file names or hypertext addresses.
-vector<string> getLocationTexts(vector<string> addresses)
+inline vector<string> getLocationTexts(vector<string> addresses)
 {
 	vector<string> locationTexts;
 
@@ -439,7 +439,7 @@ vector<string> getLocationTexts(vector<string> addresses)
 }
 
 // Get the lowercase string.
-string getLower(const string& text)
+inline string getLower(const string& text)
 {
 	unsigned int textLength = text.length();
 	string lower = text.substr();
@@ -453,7 +453,7 @@ string getLower(const string& text)
 }
 
 // Get the peer names from the text.
-vector<string> getPeerNames(const string& text)
+inline vector<string> getPeerNames(const string& text)
 {
 	bool isPeerSection = false;
 	vector<string> peerNames;
@@ -485,7 +485,7 @@ vector<string> getPeerNames(const string& text)
 }
 
 // Get the string with the search string replaced with the replace string.
-string getReplaced(const string& text, const string& searchString, const string& replaceString)
+inline string getReplaced(const string& text, const string& searchString, const string& replaceString)
 {
 	string::size_type position = 1;
 	string replaced = text.substr();
@@ -501,7 +501,7 @@ string getReplaced(const string& text, const string& searchString, const string&
 }
 
 // Determine if the first string starts with the second string.
-bool getStartsWith(const string& firstString, const string& secondString)
+inline bool getStartsWith(const string& firstString, const string& secondString)
 {
 	if (firstString.substr(0, secondString.size()) == secondString)
 		return true;
@@ -510,13 +510,13 @@ bool getStartsWith(const string& firstString, const string& secondString)
 }
 
 // Get the step file name by the file name.
-string getStepFileName(const string& fileName, int height, int step)
+inline string getStepFileName(const string& fileName, int height, int step)
 {
 	return getSuffixedFileName(fileName, getStringByInt(height / step));
 }
 
 // Get the step output according to the peers listed in a file.
-string getStepOutput(const string& directoryPathInput, const string& fileName, int height, int step)
+inline string getStepOutput(const string& directoryPathInput, const string& fileName, int height, int step)
 {
 
 	string directoryPath = string();
@@ -561,7 +561,7 @@ string getStepOutput(const string& directoryPathInput, const string& fileName, i
 }
 
 // Get the step text by the file name.
-string getStepText(const string& dataDirectory, const string& fileName, int height, int step)
+inline string getStepText(const string& dataDirectory, const string& fileName, int height, int step)
 {
 
 	string stepFileName = getStepFileName(fileName, height, step);
@@ -612,7 +612,7 @@ string getStepText(const string& dataDirectory, const string& fileName, int heig
 }
 
 // Get the step text recursively.
-string getStepTextRecursively(const string& directoryPath, const string& fileName, int height, const string& previousTextInput, int step, int valueDown)
+inline string getStepTextRecursively(const string& directoryPath, const string& fileName, int height, const string& previousTextInput, int step, int valueDown)
 {
 	string previousText = previousTextInput.substr();
 	string stepFileName;
@@ -629,7 +629,7 @@ string getStepTextRecursively(const string& directoryPath, const string& fileNam
 }
 
 // Get the string from the boolean.
-string getStringByBoolean(bool boolean)
+inline string getStringByBoolean(bool boolean)
 {
 	if (boolean)
 		return string("true");
@@ -637,7 +637,7 @@ string getStringByBoolean(bool boolean)
 }
 
 // Get the string from the double precision float.
-string getStringByDouble(double doublePrecision)
+inline string getStringByDouble(double doublePrecision)
 {
 	ostringstream doubleStream;
 
@@ -647,7 +647,7 @@ string getStringByDouble(double doublePrecision)
 }
 
 // Get the string from the integer.
-string getStringByInt(int integer)
+inline string getStringByInt(int integer)
 {
 	ostringstream integerStream;
 
@@ -657,7 +657,7 @@ string getStringByInt(int integer)
 }
 
 // Get the file name with the suffix just before the extension.
-string getSuffixedFileName(const string& fileName, const string& suffix)
+inline string getSuffixedFileName(const string& fileName, const string& suffix)
 {
 	if (suffix == string())
 		return fileName;
@@ -670,7 +670,7 @@ string getSuffixedFileName(const string& fileName, const string& suffix)
 }
 
 // Get the file names with the suffixes just before the extension.
-vector<string> getSuffixedFileNames(vector<string> fileNames, const string& suffix)
+inline vector<string> getSuffixedFileNames(vector<string> fileNames, const string& suffix)
 {
 	vector<string> suffixedFileNames;
 
@@ -689,13 +689,13 @@ vector<string> getSuffixedFileNames(vector<string> fileNames, const string& suff
 }
 
 // Get all the lines of text of a text.
-vector<string> getTextLines(const string& text)
+inline vector<string> getTextLines(const string& text)
 {
 	return getTokens(getReplaced(getReplaced(text, string("\r"), string("\n")), string("\n\n"), string("\n")), string("\n"));
 }
 
 // Get the text without whitespace, joined with newlines in between.
-string getTextWithoutWhitespaceByLines(vector<string> lines)
+inline string getTextWithoutWhitespaceByLines(vector<string> lines)
 {
 	string textWithoutWhitespace = string();
 
@@ -711,7 +711,7 @@ string getTextWithoutWhitespaceByLines(vector<string> lines)
 }
 
 // Get the tokens of the text split by the delimeters.
-vector<string> getTokens(const string& text, const string& delimiters)
+inline vector<string> getTokens(const string& text, const string& delimiters)
 {
 	vector<string> tokens;
 	string::size_type lastPosition = text.find_first_not_of(delimiters, 0);
@@ -728,7 +728,7 @@ vector<string> getTokens(const string& text, const string& delimiters)
 }
 
 // Make a directory if it does not already exist.
-void makeDirectory(const string& directoryPath)
+inline void makeDirectory(const string& directoryPath)
 {
 	if (getReplaced(directoryPath) == string() || directoryPath == string("."))
 		return;
@@ -743,7 +743,7 @@ void makeDirectory(const string& directoryPath)
 }
 
 // Write a text to a file.
-void writeFileText(const string& fileName, const string& fileText)
+inline void writeFileText(const string& fileName, const string& fileText)
 {
 	if (fileText == string())
 	{
@@ -763,13 +763,13 @@ void writeFileText(const string& fileName, const string& fileText)
 }
 
 // Write a text to a file joined to the directory path.
-void writeFileTextByDirectory(const string& directoryPath, const string& fileName, const string& fileText)
+inline void writeFileTextByDirectory(const string& directoryPath, const string& fileName, const string& fileText)
 {
 	writeFileText(getJoinedPath(directoryPath, fileName), fileText);
 }
 
 // Write next step file if height is higher than the threshold.
-void writeNextIfValueHigher(const string& directoryPath, const string& fileName, int height, int step, const string& stepText)
+inline void writeNextIfValueHigher(const string& directoryPath, const string& fileName, int height, int step, const string& stepText)
 {
 	int remainder = height - step * (height / step);
 	double aboveThreshold = globalLessThanOneMinusThreshold * getFileRandomNumber(directoryPath, fileName);
