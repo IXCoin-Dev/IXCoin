@@ -65,8 +65,6 @@ static const int64_t share = roundint64(initialSubsidy * 0.9);
 static const int64_t fallbackReduction = roundint64((initialSubsidy + share) / 2);
 static const int step = 4000;
 const std::string receiverCSV = std::string("receiver.csv");
-const std::string receiverCSVTestNet = std::string("receiverTestNet.csv");
-
 
 // Start accepting AUX POW at this block
 // 

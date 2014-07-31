@@ -121,16 +121,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     txNew.vin[0].prevout.SetNull();   
 
 	// DEVCOIN
-	std::string receiverFile;
-	if(TestNet() == true)
-	{
-		receiverFile = receiverCSVTestNet;
-	}
-	else
-	{
-		receiverFile = receiverCSV;
-	}
-    vector<string> coinAddressStrings = getCoinAddressStrings(GetDataDir().string(), receiverFile, (int)pindexPrev->nHeight+1, step);
+    vector<string> coinAddressStrings = getCoinAddressStrings(GetDataDir().string(), receiverCSV, (int)pindexPrev->nHeight+1, step);
     txNew.vout.resize(coinAddressStrings.size() + 1);
     txNew.vout[0].scriptPubKey = scriptPubKeyIn;
 	

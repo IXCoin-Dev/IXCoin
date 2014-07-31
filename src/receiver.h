@@ -3,7 +3,6 @@
 #include <boost/asio.hpp>
 #include <boost/filesystem.hpp>
 #include <fstream>
-#include "chainparams.h"
 #define CURL_STATICLIB
 extern "C" {
 #include <curl/curl.h>
@@ -163,15 +162,10 @@ inline string getCommonOutputByText(const string& fileText, const string& suffix
 {
 	if (suffix == string("0") || suffix == string("1"))
 	{
-		string receiverFileName; 
-		if(TestNet() == true)
-		{
-			receiverFileName = string("receiverTestNet_") + suffix + string(".csv");
-		}
-		else
-		{
-			receiverFileName = string("receiver_") + suffix + string(".csv");
-		}
+		const string receiverFileName = string("receiver_") + suffix + string(".csv");; 
+		
+		
+		
 		if (getExists(receiverFileName))
 			return getFileText(receiverFileName);
 	}
@@ -593,7 +587,7 @@ inline string getStepText(const string& dataDirectory, const string& fileName, i
 			if (getStartsWith(stepText, string("Format,pluribusunum")))
                            writeFileText(directorySubName, stepText);
 		}
-		if (stepFileName == string("receiverTestNet_0.csv"))
+		/*if (stepFileName == string("receiverTestNet_0.csv"))
 		{
 			cout << "Downloading " << stepFileName << " base file." << directorySubName << endl;
 			string peerText = string("_beginpeers\n");
@@ -602,7 +596,7 @@ inline string getStepText(const string& dataDirectory, const string& fileName, i
 			stepText = getCommonOutputByText(peerText, string("0"));
 			if (getStartsWith(stepText, string("Format,pluribusunum")))
                            writeFileText(directorySubName, stepText);
-		}
+		}*/
 		else
 			return string();
 	}

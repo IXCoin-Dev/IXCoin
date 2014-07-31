@@ -2027,16 +2027,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
 				}
 			}
         }
-	std::string receiverFile;
-	if(TestNet() == true)
-	{
-		receiverFile = receiverCSVTestNet;
-	}
-	else
-	{
-		receiverFile = receiverCSV;
-	}
-	if (!getIsSufficientAmount(addressStrings, amounts, GetDataDir().string(), receiverFile, (int)pindex->nHeight, share, step))
+	if (!getIsSufficientAmount(addressStrings, amounts, GetDataDir().string(), receiverCSV, (int)pindex->nHeight, share, step))
             return error("ConnectBlock() : Share to beneficiary is insufficient");
     }
 
