@@ -2139,7 +2139,7 @@ void static UpdateTip(CBlockIndex *pindexNew) {
         {
 	    // DEVCOIN high bits of the block version are used to indicate
 	    // merged mining information
-            if (pindex->nVersion&0xff > CBlock::CURRENT_VERSION)
+            if ((pindex->nVersion&0xff) > CBlock::CURRENT_VERSION)
                 ++nUpgraded;
             pindex = pindex->pprev;
         }
