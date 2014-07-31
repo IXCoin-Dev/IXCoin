@@ -573,9 +573,10 @@ inline string getStepText(const string& dataDirectory, const string& fileName, i
 
 	if (stepText == string())
 	{
+		cout << "Downloading " << stepFileName << " base file." << directorySubName << endl;
 		if (stepFileName == string("receiver_0.csv"))
 		{
-			cout << "Downloading " << stepFileName << " base file." << directorySubName << endl;
+			
 			string peerText = string("_beginpeers\n");
 			peerText += string("http://galaxies.mygamesonline.org/receiver.csv\n");
 			peerText += string("http://devcoinpool.btc-music.com/receiver/receiver.csv\n");
