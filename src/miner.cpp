@@ -118,57 +118,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     // Create coinbase tx
     CTransaction txNew;
     txNew.vin.resize(1);
-    txNew.vin[0].prevout.SetNull();   
-
-	// DEVCOIN
-    vector<string> coinAddressStrings = getCoinAddressStrings(GetDataDir().string(), receiverCSV, (int)pindexPrev->nHeight+1, step);
-    txNew.vout.resize(coinAddressStrings.size() + 1);
-    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
-	
-	// Prepare to pay beneficiaries
-
-    int64_t nFees = 0;
-    int64_t minerValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
-    int64_t sharePerAddress = 0;
-    if (coinAddressStrings.size() == 0)
-        minerValue -= fallbackReduction;
-    else
-        sharePerAddress = roundint64((int64_t)share / (int64_t)coinAddressStrings.size());
-	
-	LogPrintf("coinAddressStrings: %d\n", coinAddressStrings.size());
-    for (unsigned int i=0; i<coinAddressStrings.size(); i++)
-    {
-		
-     	const std::string coinAddressString = coinAddressStrings[i];
-        // Create transaction
-        CKeyID addrKeyId;
-		CBitcoinAddress addr(coinAddressString);
-		if(!addr.IsValid())
-		{
-			LogPrintf("CBitcoinAddress not valid! %s\n", coinAddressString.c_str());
-			return NULL;
-		}
-		
-		if(addr.GetKeyID(addrKeyId))
-		{
-			txNew.vout[i + 1].scriptPubKey << OP_DUP << OP_HASH160 << addrKeyId << OP_EQUALVERIFY << OP_CHECKSIG;
-			txNew.vout[i + 1].nValue = sharePerAddress;
-			
-			minerValue -= sharePerAddress;
-			LogPrintf("Address %s valid, value %d, minerValue %d\n", coinAddressString.c_str(), txNew.vout[i + 1].nValue, minerValue);
-			
-		}
-		else
-		{
-			LogPrintf("Address key invalid for: %s\n", coinAddressString.c_str());
-		}
-		if(txNew.vout[i + 1].nValue < 0)
-		{
-			LogPrintf("negative vout value:  %d\n", txNew.vout[i + 1].nValue);
-			txNew.vout[i + 1].nValue = 0;
-		}
-    }
-	// END DEVCOIN
+    txNew.vin[0].prevout.SetNull();
+    txNew.vout.resize(1);
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -191,7 +142,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     nBlockMinSize = std::min(nBlockMaxSize, nBlockMinSize);
 
     // Collect memory pool transactions into the block
-    nFees = 0;
+    int64_t nFees = 0;
     {
         LOCK2(cs_main, mempool.cs);
         
@@ -372,9 +323,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         nLastBlockSize = nBlockSize;
         LogPrintf("CreateNewBlock(): total size %u\n", nBlockSize);
 
-        //pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
-		// DEVCOIN
-		pblock->vtx[0].vout[0].nValue = minerValue + nFees;
+        pblock->vtx[0].vout[0].nValue = GetBlockValue(pindexPrev->nHeight+1, nFees);
         pblocktemplate->vTxFees[0] = -nFees;
 
         // Fill in header

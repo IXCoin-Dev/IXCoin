@@ -58,18 +58,8 @@ enum BlockStatus {
     BLOCK_FAILED_CHILD       =   64, // descends from failed block
     BLOCK_FAILED_MASK        =   96
 };
-
-//DEVCOIN globals
-static const int64_t initialSubsidy = 50000*COIN ;
-static const int64_t share = roundint64(initialSubsidy * 0.9);
-static const int64_t fallbackReduction = roundint64((initialSubsidy + share) / 2);
-static const int step = 4000;
-const std::string receiverCSV = std::string("receiver.csv");
-
 // Start accepting AUX POW at this block
-// 
 // Even if we do not accept AUX POW ourselves, we can always be the parent chain.
- 
 inline int GetAuxPowStartBlock()
 {
     if (TestNet())

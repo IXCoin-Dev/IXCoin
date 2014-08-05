@@ -50,9 +50,9 @@ bool fTxIndex = false;
 unsigned int nCoinCacheSize = 5000;
 
 /** Fees smaller than this (in satoshi) are considered zero fee (for transaction creation) */
-int64_t CTransaction::nMinTxFee = 10000*1000;  // Override with -mintxfee
+int64_t CTransaction::nMinTxFee = 10000;
 /** Fees smaller than this (in satoshi) are considered zero fee (for relaying and mining) */
-int64_t CTransaction::nMinRelayTxFee = 1000*1000;
+int64_t CTransaction::nMinRelayTxFee = 1000;
 
 
 struct COrphanBlock {
@@ -1226,24 +1226,18 @@ void static PruneOrphanBlocks()
     mapOrphanBlocks.erase(hash);
 }
 
-//int64_t GetBlockValue(int nHeight, int64_t nFees)
-//{
-//    int64_t nSubsidy = 50 * COIN;
-//    int halvings = nHeight / Params().SubsidyHalvingInterval();
-//
-//    // Force block reward to zero when right shift is undefined.
-//    if (halvings >= 64)
-//        return nFees;
-//
-//    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
-//    nSubsidy >>= halvings;
-//
-//    return nSubsidy + nFees;
-//}
-// DEVCOIN
 int64_t GetBlockValue(int nHeight, int64_t nFees)
 {
-    int64_t nSubsidy = initialSubsidy;
+    int64_t nSubsidy = 50 * COIN;
+    int halvings = nHeight / Params().SubsidyHalvingInterval();
+
+    // Force block reward to zero when right shift is undefined.
+    if (halvings >= 64)
+        return nFees;
+
+    // Subsidy is cut in half every 210,000 blocks which will occur approximately every 4 years.
+    nSubsidy >>= halvings;
+
     return nSubsidy + nFees;
 }
 static int64_t nTargetTimespan = 24 * 60 * 60; // one day
@@ -2019,34 +2013,6 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
                                block.vtx[0].GetValueOut(), GetBlockValue(pindex->nHeight, nFees)),
                                REJECT_INVALID, "bad-cb-amount");
 
-
-	// DEVCOIN
-    // Check that the required share was sent to each beneficiary
-    //
-    if (block.vtx[0].GetValueOut() > (GetBlockValue(pindex->nHeight, nFees) - fallbackReduction))
-    {
-     	std::vector<std::string> addressStrings;
-        std::vector<int64_t> amounts;
-
-        for (unsigned int i = 1; i < block.vtx[0].vout.size(); i++)
-        {
-			CTxDestination txaddress;
-			if (ExtractDestination(block.vtx[0].vout[i].scriptPubKey, txaddress))
-			{
-				
-				CBitcoinAddress addr(txaddress);
-				if (addr.IsValid())
-				{
-					addressStrings.push_back(addr.ToString());
-					amounts.push_back(block.vtx[0].vout[i].nValue);
-				}
-			}
-        }
-	if (!getIsSufficientAmount(addressStrings, amounts, GetDataDir().string(), receiverCSV, (int)pindex->nHeight, share, step))
-            return error("ConnectBlock() : Share to beneficiary is insufficient");
-    }
-
-	// END DEVCOIN
     if (!control.Wait())
         return state.DoS(100, false);
     int64_t nTime2 = GetTimeMicros() - nStart;
@@ -2137,8 +2103,6 @@ void static UpdateTip(CBlockIndex *pindexNew) {
         const CBlockIndex* pindex = chainActive.Tip();
         for (int i = 0; i < 100 && pindex != NULL; i++)
         {
-	    // DEVCOIN high bits of the block version are used to indicate
-	    // merged mining information
             if ((pindex->nVersion&0xff) > CBlock::CURRENT_VERSION)
                 ++nUpgraded;
             pindex = pindex->pprev;
