@@ -53,16 +53,7 @@ public:
     };
 
     const uint256& HashGenesisBlock() const { return hashGenesisBlock; }
-    const MessageStartChars& MessageStart() const { 
-	if (GetAdjustedTime() < 1314835971)
-	{
-		return pchMessageStart1;
-	}
-	else
-	{
-		return pchMessageStart2;
-	}
-    }
+    const MessageStartChars& MessageStart() const { return pchMessageStart1; }
     const vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
     const CBigNum& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
