@@ -3,8 +3,8 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef BITCOIN_TXDB_LEVELDB_H
-#define BITCOIN_TXDB_LEVELDB_H
+#ifndef IXCOIN_TXDB_LEVELDB_H
+#define IXCOIN_TXDB_LEVELDB_H
 
 #include "leveldbwrapper.h"
 #include "main.h"
@@ -68,4 +68,4 @@ public:
     bool LoadBlockIndexGuts();
 };
 
-#endif // BITCOIN_TXDB_LEVELDB_H
+#endif // IXCOIN_TXDB_LEVELDB_H

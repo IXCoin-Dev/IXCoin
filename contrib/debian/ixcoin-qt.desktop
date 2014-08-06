@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=IXCoin
+Comment=IXCoin P2P Cryptocurrency
+Comment[fr]=IXCoin, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=IXCoin, eşten eşe kriptografik sanal para birimi
+Exec=ixcoin-qt %u
+Terminal=false
+Type=Application
+Icon=ixcoin128
+MimeType=x-scheme-handler/ixcoin;
+Categories=Office;Finance;

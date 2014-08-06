@@ -13,7 +13,7 @@ namespace Ui {
     class RPCConsole;
 }
 
-/** Local Bitcoin RPC console. */
+/** Local IXCoin RPC console. */
 class RPCConsole: public QDialog
 {
     Q_OBJECT

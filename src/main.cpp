@@ -27,7 +27,7 @@ using namespace std;
 using namespace boost;
 
 #if defined(NDEBUG)
-# error "Bitcoin cannot be compiled without assertions."
+# error "IXCoin cannot be compiled without assertions."
 #endif
 
 //
@@ -69,7 +69,7 @@ map<uint256, set<uint256> > mapOrphanTransactionsByPrev;
 // Constant stuff for coinbase transactions we create:
 CScript COINBASE_FLAGS;
 
-const string strMessageMagic = "Bitcoin Signed Message:\n";
+const string strMessageMagic = "Ixcoin Signed Message:\n";
 
 // Internal stuff
 namespace {
@@ -1879,7 +1879,7 @@ bool FindUndoPos(CValidationState &state, int nFile, CDiskBlockPos &pos, unsigne
 static CCheckQueue<CScriptCheck> scriptcheckqueue(128);
 
 void ThreadScriptCheck() {
-    RenameThread("bitcoin-scriptch");
+    RenameThread("ixcoin-scriptch");
     scriptcheckqueue.Thread();
 }
 
@@ -1916,7 +1916,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     // two in the chain that violate it. This prevents exploiting the issue against nodes in their
     // initial block download.
    //
-    // This rule applies to all Bitcoin blocks whose timestamp is after March 15, 2012, 0:00 UTC.
+    // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2012, 0:00 UTC.
     //
     // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC 
     // date -d "2012-03-15 0:00 UTC" +"%s"
@@ -1925,7 +1925,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     
 	
 	// after BIP30 is enabled for some time, we could make the same change
-    // as Bitcoin, namely the one suggested below
+    // as IXCoin, namely the one suggested below
     // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
     // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
     // two in the chain that violate it. This prevents exploiting the issue against nodes in their
