@@ -39,6 +39,7 @@ CCriticalSection cs_main;
 CTxMemPool mempool;
 
 map<uint256, CBlockIndex*> mapBlockIndex;
+CBlockIndex* pindexGenesisBlock = NULL;
 CChain chainActive;
 CChain chainMostWork;
 int64_t nTimeBestReceived = 0;
@@ -1546,9 +1547,10 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits)
     const CBigNum &bnLimit = Params().ProofOfWorkLimit();
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
+    printf("Hash: %s, nBits: %08x, Target: %08x, bnLimt: %08x \n", hash.ToString().c_str(), nBits, bnTarget.GetCompact(), bnLimit.GetCompact());
 
     // Check range
-    if (bnTarget <= 0 || bnTarget > bnLimit)
+    if (bnTarget <= 0 || bnTarget > bnLimit.GetCompact())
         return error("CheckProofOfWork() : nBits below minimum work");
 
     // Check proof of work matches claimed amount
@@ -1980,6 +1982,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     // (its coinbase is unspendable)
     if (block.GetHash() == Params().HashGenesisBlock()) {
         view.SetBestBlock(pindex->GetBlockHash());
+	pindexGenesisBlock = pindex;
         return true;
     }
 
@@ -2409,7 +2412,8 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     if (miPrev != mapBlockIndex.end())
     {
 		// only possible if pindexNew is not the genesis block ?!?!!?
-		assert(pindexNew->GetBlockHash() != Params().HashGenesisBlock());
+		//assert(pindexNew->GetBlockHash() != Params().HashGenesisBlock());
+		//assert(pindexNew->GetBlockHash() != pindexGenesisBlock->phashBlock);
         pindexNew->pprev = (*miPrev).second;	// cacheBlockIndex assignment pprev
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
     }
@@ -3249,6 +3253,7 @@ void UnloadBlockIndex()
 {
     mapBlockIndex.clear();
     setBlockIndexValid.clear();
+    pindexGenesisBlock = NULL;
     chainActive.SetTip(NULL);
     pindexBestInvalid = NULL;
 }
@@ -3312,7 +3317,7 @@ void PrintBlockTree()
     }
 
     vector<pair<int, CBlockIndex*> > vStack;
-    vStack.push_back(make_pair(0, chainActive.Genesis()));
+    vStack.push_back(make_pair(0, pindexGenesisBlock));
 
     int nPrevCol = 0;
     while (!vStack.empty())
