@@ -98,6 +98,9 @@ extern int nScriptCheckThreads;
 extern bool fTxIndex;
 extern unsigned int nCoinCacheSize;
 
+extern uint256 hashGenesisBlock;
+extern CBlockIndex* pindexGenesisBlock;
+
 // Minimum disk space required - used in CheckDiskSpace()
 static const uint64_t nMinDiskSpace = 52428800;
 

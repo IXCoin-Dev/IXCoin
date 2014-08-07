@@ -1274,7 +1274,7 @@ unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime)
 // Return the target (difficulty) to the new block based on the pindexLast block
 unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
-    const CBigNum &bnLimit = Params().ProofOfWorkLimit();
+    unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
 
     /* these values shadow the global ones with the same name
      * this function is only used for blocks before 14640... */
@@ -1284,7 +1284,7 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
 
     // Genesis block
     if (pindexLast == NULL)
-        return bnLimit.GetCompact();
+        return nProofOfWorkLimit;
 
 	int64 nRemaining = (pindexLast->nHeight+1) % nInterval;
 
@@ -1323,31 +1323,25 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
     bnNew *= nActualTimespan;
     bnNew /= nTargetTimespan;
 
-    if (bnNew > bnLimit)
-        bnNew = bnLimit;
-
+    if (bnNew > Params().ProofOfWorkLimit())
+        bnNew = Params().ProofOfWorkLimit();
  
-    /// debug print
-    printf("GetNextWorkRequired RETARGET\n");
-    printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
-    printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
-
     return bnNew.GetCompact();
 }
 
 unsigned int static GetNextWorkRequired_IXC(const CBlockIndex* pindexLast)
 {
-    const CBigNum &bnLimit = Params().ProofOfWorkLimit();
+    unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
     int64 nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
     bool revisedIxcoin = pindexLast->nHeight+1 > 20055; //next normal target: 20160
     if (revisedIxcoin) nTargetTimespan = 24 * 60 * 60; //24 hours i.e. 144 blocks
 
-	const int64 nTargetSpacing = 10 * 60;
+    const int64 nTargetSpacing = 10 * 60;
     const int64 nInterval = nTargetTimespan / nTargetSpacing;
 
     // Genesis block
     if (pindexLast == NULL)
-        return bnLimit.GetCompact();
+        return nProofOfWorkLimit;
 
     const int height = pindexLast->nHeight + 1;
 
@@ -1405,13 +1399,8 @@ unsigned int static GetNextWorkRequired_IXC(const CBlockIndex* pindexLast)
     bnNew *= nActualTimespan;
     bnNew /= nTargetTimespan;
 
-    if (bnNew > bnLimit)
-        bnNew = bnLimit;
-
-    /// debug print
-    printf("GetNextWorkRequired RETARGET\n");
-    printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
-    printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
+    if (bnNew > Params().ProofOfWorkLimit())
+        bnNew = Params().ProofOfWorkLimit();
 
     return bnNew.GetCompact();
 }
@@ -1421,12 +1410,12 @@ unsigned int static GetNextWorkRequired_IXC(const CBlockIndex* pindexLast)
 //blatantly stolen from SolidCoin
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
-
+    unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
     const CBigNum &bnLimit = Params().ProofOfWorkLimit();
 
     // Genesis block
     if (pindexLast == NULL)
-        return bnLimit.GetCompact();
+        return nProofOfWorkLimit;
 
     const int height = pindexLast->nHeight + 1;
 
@@ -1446,7 +1435,7 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
             // If the new block's timestamp is more than 2* 10 minutes
             // then allow mining of a min-difficulty block.
             if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
-                return bnLimit.GetCompact();
+                return nProofOfWorkLimit;
             else
             {
                 // Return the last non-special-min-difficulty-rules-block
@@ -1534,21 +1523,19 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         bnNew = bnLimit;
 
    /// debug print
-    printf("GetNextWorkRequired RETARGET\n");
-    printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
-    printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
 
     return bnNew.GetCompact();
 }
 
 bool CheckProofOfWork(uint256 hash, unsigned int nBits)
 {
-    const CBigNum &bnLimit = Params().ProofOfWorkLimit();
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
+    //Params().GenesisBlock().print();
+    //printf("Hash: %s, nBits: %08x, Target: %08x, bnLimt: %08x \n", hash.ToString().c_str(), nBits, bnTarget.GetCompact(), Params().ProofOfWorkLimit().GetCompact());
 
     // Check range
-    if (bnTarget <= 0 || bnTarget > bnLimit)
+    if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
         return error("CheckProofOfWork() : nBits below minimum work");
 
     // Check proof of work matches claimed amount
@@ -2409,7 +2396,8 @@ bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos
     if (miPrev != mapBlockIndex.end())
     {
 		// only possible if pindexNew is not the genesis block ?!?!!?
-		assert(pindexNew->GetBlockHash() != Params().HashGenesisBlock());
+		//assert(pindexNew->GetBlockHash() != Params().HashGenesisBlock());
+		//assert(pindexNew->GetBlockHash() != pindexGenesisBlock->phashBlock);
         pindexNew->pprev = (*miPrev).second;	// cacheBlockIndex assignment pprev
         pindexNew->nHeight = pindexNew->pprev->nHeight + 1;
     }

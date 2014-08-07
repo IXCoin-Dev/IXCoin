@@ -29,10 +29,10 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart1[0] = 0xf9;
-        pchMessageStart1[1] = 0xbe;
-        pchMessageStart1[2] = 0xb4;
-	pchMessageStart1[3] = 0xd9;
+        pchMessageStart[0] = 0xf9;
+        pchMessageStart[1] = 0xbe;
+        pchMessageStart[2] = 0xb4;
+	pchMessageStart[3] = 0xd9;
 	pchMessageStart2[0] = 0xf1;
 	pchMessageStart2[1] = 0xba;
 	pchMessageStart2[2] = 0xb6;
@@ -59,7 +59,6 @@ public:
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         txNew.vout[0].nValue = 50 * COIN;
         txNew.vout[0].scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11984") << OP_CHECKSIG;
-        CBlock genesis;
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
@@ -118,10 +117,10 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart1[0] = 'd';
-        pchMessageStart1[1] = 'e';
-        pchMessageStart1[2] = 'v';
-        pchMessageStart1[3] = '-';
+        pchMessageStart[0] = 'd';
+        pchMessageStart[1] = 'e';
+        pchMessageStart[2] = 'v';
+        pchMessageStart[3] = '-';
         vAlertPubKey = ParseHex("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
         nDefaultPort = 53333;
         nRPCPort = 53332;
@@ -185,10 +184,10 @@ static CTestNetParams testNetParams;
 class CRegTestParams : public CTestNetParams {
 public:
     CRegTestParams() {
-        pchMessageStart1[0] = 'd';
-        pchMessageStart1[1] = 'e';
-        pchMessageStart1[2] = 'v';
-        pchMessageStart1[3] = 'r';
+        pchMessageStart[0] = 'd';
+        pchMessageStart[1] = 'e';
+        pchMessageStart[2] = 'v';
+        pchMessageStart[3] = 'r';
         nSubsidyHalvingInterval = 150;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 1);
         genesis.nTime = 1296688602;

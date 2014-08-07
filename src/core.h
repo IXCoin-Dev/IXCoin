@@ -460,14 +460,14 @@ class CBlockHeader
 {
 public:
     // header
-	static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
+    static const int CURRENT_VERSION=BLOCK_VERSION_DEFAULT;
     int nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
-	boost::shared_ptr<CAuxPow> auxpow;
+    boost::shared_ptr<CAuxPow> auxpow;
 
     CBlockHeader()
     {
@@ -484,22 +484,26 @@ public:
         READWRITE(nBits);
         READWRITE(nNonce);
 
-		nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
+	nSerSize += ReadWriteAuxPow(s, auxpow, nType, nVersion, ser_action);
     )
-	void SetAuxPow(CAuxPow* pow);
+
+    void SetAuxPow(CAuxPow* pow);
+
     void SetNull()
     {
-		nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
+	nVersion = CBlockHeader::CURRENT_VERSION | (GetOurChainID() * BLOCK_VERSION_CHAIN_START);
         hashPrevBlock = 0;
         hashMerkleRoot = 0;
         nTime = 0;
         nBits = 0;
         nNonce = 0;
     }
+
     int GetChainID() const
     {
         return nVersion / BLOCK_VERSION_CHAIN_START;
     }
+
     bool IsNull() const
     {
         return (nBits == 0);
@@ -511,7 +515,8 @@ public:
     {
         return (int64_t)nTime;
     }
-	bool CheckProofOfWork(int nHeight) const;
+
+    bool CheckProofOfWork(int nHeight) const;
 };
 
 class CAuxPow : public CMerkleTx
@@ -626,6 +631,7 @@ public:
         block.nTime          = nTime;
         block.nBits          = nBits;
         block.nNonce         = nNonce;
+	block.auxpow	     = auxpow;
         return block;
     }
 

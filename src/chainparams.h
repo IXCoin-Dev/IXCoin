@@ -53,7 +53,16 @@ public:
     };
 
     const uint256& HashGenesisBlock() const { return hashGenesisBlock; }
-    const MessageStartChars& MessageStart() const { return pchMessageStart1; }
+    const MessageStartChars& MessageStart() const { 
+	//Keep using bitcoin messageStart until switch-over date
+	if (GetAdjustedTime() < 1314835971) { //09/01/11 00:12:51
+		return pchMessageStart;
+	}
+        else
+        {
+		return pchMessageStart2;
+        }
+    }
     const vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
     const CBigNum& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
@@ -70,7 +79,7 @@ protected:
     CChainParams() {}
 
     uint256 hashGenesisBlock;
-    MessageStartChars pchMessageStart1;
+    MessageStartChars pchMessageStart;
     MessageStartChars pchMessageStart2;
     // Raw pub key bytes for the broadcast alert signing key.
     vector<unsigned char> vAlertPubKey;
