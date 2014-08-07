@@ -1989,7 +1989,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     //
     // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC 
     // date -d "2012-03-15 0:00 UTC" +"%s"
-    int64_t nBIP30SwitchTime = 1331769600;
+    int64_t nBIP30SwitchTime = 1388624831;
     bool fEnforceBIP30 = (!pindex->phashBlock) || (pindex->nTime > nBIP30SwitchTime);
     
 	
