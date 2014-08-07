@@ -8,6 +8,7 @@
 #include "sync.h"
 #include "checkpoints.h"
 #include "core.h"
+#include "alert.h"
 #include <stdint.h>
 
 #include "json/json_spirit_value.h"
@@ -505,3 +506,4 @@ Value getblockchaininfo(const Array& params, bool fHelp)
     obj.push_back(Pair("chainwork",     chainActive.Tip()->nChainWork.GetHex()));
     return obj;
 }
+
