@@ -3,7 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "checkpoints.h"
-
+#include "chainparams.cpp"
 #include "main.h"
 #include "uint256.h"
 
@@ -39,25 +39,16 @@ namespace Checkpoints
     // + Contains no strange transactions
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
-	// before block 14640, the retarget period in Devcoin was 1 week
-	// the function ComputeMinWork uses the current retarget period
-	// of 3 hours, this is no problem UNLESS someone adds a checkpoint before
-	// block 14640, should be no problem....
-	( 2500, uint256("0x000000001871a2314936d39b85174cc911bf6fd58d3877412ee7b69a48e7e29e"))
-	( 4500, uint256("0x000000000967cc95711f66f804e3f431298686d681d2d5760f61856954d08faf"))
-	( 5250, uint256("0x00000000085702bfbf27daffb638be65aceb78a5f464b12539b51c1b9c548421"))
-	( 8900, uint256("0x00000000001bb8090630fcabb82ad0ab75df3eb5b008956b3ae2a352a4324f19"))
-	( 23500, uint256("0x000000000b83c3c9753d2440b91121cb0ff220bb23c136c6d09a539207e292fb"))
-	( 54800, uint256("0x04e8dcc91ff2aa0f1197f88551b4cb24ccef02ea51081b4d05ab4e3a38554137"))
-	( 67720, uint256("0x0a111b265d89f77b4c86fa6f44e3e2ad876547b1eccf19319cde922b42c1161e"))	;
-
+	(  4500,  uint256("0x00000000de37be98ca45cf0613fa2a321eba28e237543f9fee9b6a7605d03a94"))
+	;
 
     /* Devcoin had not testnet checkblocks, if they even start to exist, they can be added here */
     static MapCheckpoints mapCheckpointsTestnet  = boost::assign::map_list_of 
-		(0,  uint256("0x00000000fc09a99bd5116e9cedcad35d2145962799e58bbfd66ebdeb4e95235f"));
+	( 0, uint256("0x0000000e266692d6c16814490ca60acda9398727680325386bbdd98c61457a48"))
+	;
     static const CCheckpointData data = {
         &mapCheckpoints,
-        1354231672, // * UNIX timestamp of last checkpoint block
+        1304113447, // * UNIX timestamp of last checkpoint block
         936858,     // * total number of transactions between genesis and last checkpoint
                     //   (the tx=... number in the SetBestChain debug.log lines)
         1000.0      // * estimated number of transactions per day after checkpoint

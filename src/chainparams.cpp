@@ -20,7 +20,7 @@ using namespace boost::assign;
 
 unsigned int pnSeed[] =
 {
-    0xb73c9ac6, 0x2c267432, 0x3d3c9ac6, 0x75393d6c, 0x68e90905, 0xf0aa22ae,
+    0xb10f5442, 0x99e16042, 0xaac76a26, 0xb20f5442, 0x74B347CE, 0x90ccc780, 0x1586c780, 0x82153eb2, 0xbe2bf3a2
 };
 
 class CMainParams : public CChainParams {
@@ -29,13 +29,17 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart[0] = 'D';
-        pchMessageStart[1] = 'E';
-        pchMessageStart[2] = 'V';
-		pchMessageStart[3] = ':';
-        vAlertPubKey = ParseHex("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
-        nDefaultPort = 52333;
-        nRPCPort = 52332;
+        pchMessageStart[0] = 0xf9;
+        pchMessageStart[1] = 0xbe;
+        pchMessageStart[2] = 0xb4;
+	pchMessageStart[3] = 0xd9;
+	pchMessageStart2[0] = 0xf1;
+	pchMessageStart2[1] = 0xba;
+	pchMessageStart2[2] = 0xb6;
+	pchMessageStart2[3] = 0xdb;
+        vAlertPubKey = ParseHex("02a9e38d69128d1e9b689a02bb0e67927ef9aff27b62e7b0ecddec2a07ad587ad6");
+        nDefaultPort = 8337;
+        nRPCPort = 8338;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 32);
         nSubsidyHalvingInterval = 210000;
 
@@ -48,38 +52,30 @@ public:
 		//    CTxIn(COutPoint(0000000000, -1), coinbase 04ffff001d01044931352f41676f2f32303131202d2044696172696f20456c20446961202d204f62616d612063616520616c2033392520656e206c61206170726f62616369f36e20636975646164616e61)
 		//    CTxOut(nValue=48.00000000, scriptPubKey=04678afdb0fe5548271967f1a67130)
 		//  vMerkleTree: 764fc5f8e5
-        const char* pszTimestamp = "The Times web front page 22-Jul-2011 Europe hails 'historic' deal to save single currency";
+        const char* pszTimestamp = "To see the farm is to leave it";
         CTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
         txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         txNew.vout[0].nValue = 50 * COIN;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
+        txNew.vout[0].scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11984") << OP_CHECKSIG;
         genesis.vtx.push_back(txNew);
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime    = 1311305081;
+        genesis.nTime    = 1304113447;
         genesis.nBits    = 0x1d00ffff;
-        genesis.nNonce   = 3085127155;
+        genesis.nNonce   = 2245271137;
 
-        hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x0000000062558fec003bcbf29e915cddfc34fa257dc87573f28e4520d1c7c11e"));
-        assert(genesis.hashMerkleRoot == uint256("0xe61339a40aa4e90e983fe0d64cf09eed5fa1e6eac227b6761f06ac7af1929baf"));
+	hashGenesisBlock = genesis.GetHash();
+        assert(hashGenesisBlock == uint256("0x0000000001534ef8893b025b9c1da67250285e35c9f76cae36a4904fdf72c591"));
+        assert(genesis.hashMerkleRoot == uint256("0xcb3ae7b867c97ceb834c5d131355cd4bc176a44360fede9ed6d47b897397ba3f"));
 
-        vSeeds.push_back(CDNSSeedData("devtome.com", "dvcstable01.devtome.com"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable01.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable02.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable03.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable04.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable05.dvcnode.org"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable06.dvcnode.org"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable07.dvcnode.org"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.com", "node01.dvcnode.com"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.com", "node02.dvcnode.com"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.com", "node03.dvcnode.com"));
+        vSeeds.push_back(CDNSSeedData("ixcoin.co", "uk.ixcoin.co"));
+	vSeeds.push_back(CDNSSeedData("ixcoin.co", "nyc.ixcoin.co"));
+	vSeeds.push_back(CDNSSeedData("ixcoin.co", "sgp.ixcoin.co"));
 
-        base58Prefixes[PUBKEY_ADDRESS] = list_of(0);
+        base58Prefixes[PUBKEY_ADDRESS] = list_of(138);
         base58Prefixes[SCRIPT_ADDRESS] = list_of(5);
         base58Prefixes[SECRET_KEY] =     list_of(128);
         base58Prefixes[EXT_PUBLIC_KEY] = list_of(0x04)(0x88)(0xB2)(0x1E);
@@ -123,55 +119,28 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        pchMessageStart[0] = 'd';
-        pchMessageStart[1] = 'e';
-        pchMessageStart[2] = 'v';
-        pchMessageStart[3] = '-';
-        vAlertPubKey = ParseHex("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
+        pchMessageStart[0] = 0xfa;
+        pchMessageStart[1] = 0xbf;
+        pchMessageStart[2] = 0xb6;
+        pchMessageStart[3] = 0xdb;
+        strDataDir = "testnet";
+
+        vAlertPubKey = ParseHex("");
         nDefaultPort = 53333;
         nRPCPort = 53332;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 28);
         nSubsidyHalvingInterval = 210000;
 
-        // Build the genesis block. Note that the output of the genesis coinbase cannot
-        // be spent as it did not originally exist in the database.
-        //
-		// Genesis Block:
-		// CBlock(hash=00000000de13b7f748fb, ver=1, hashPrevBlock=00000000000000000000, hashMerkleRoot=764fc5f8e5, nTime=1313457620, nBits=1d00ffff, nNonce=2831549010, vtx=1)
-		//   CTransaction(hash=764fc5f8e5, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-		//    CTxIn(COutPoint(0000000000, -1), coinbase 04ffff001d01044931352f41676f2f32303131202d2044696172696f20456c20446961202d204f62616d612063616520616c2033392520656e206c61206170726f62616369f36e20636975646164616e61)
-		//    CTxOut(nValue=48.00000000, scriptPubKey=04678afdb0fe5548271967f1a67130)
-		//  vMerkleTree: 764fc5f8e5
-        const char* pszTimestamp = "The Times web front page 22-Jul-2011 Europe hails 'historic' deal to save single currency";
-        CTransaction txNew;
-        txNew.vin.resize(1);
-        txNew.vout.resize(1);
-        txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].nValue = 50 * COIN;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f") << OP_CHECKSIG;
-        genesis.vtx.push_back(txNew);
-        genesis.hashPrevBlock = 0;
-        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
-        genesis.nVersion = 1;
-        genesis.nTime    = 1311305081;
-        genesis.nBits    = 0x1d00ffff;
-        genesis.nNonce   = 3085127155;
+        genesis.nTime    = 1304113447;
+        genesis.nNonce   = 162700098;
 
         hashGenesisBlock = genesis.GetHash();
-        //assert(hashGenesisBlock == uint256("0x0000000062558fec003bcbf29e915cddfc34fa257dc87573f28e4520d1c7c11e"));
-       // assert(genesis.hashMerkleRoot == uint256("0xe61339a40aa4e90e983fe0d64cf09eed5fa1e6eac227b6761f06ac7af1929baf"));
+        
+        assert(hashGenesisBlock == uint256("0x0000000e266692d6c16814490ca60acda9398727680325386bbdd98c61457a48"));
 
-        vSeeds.push_back(CDNSSeedData("devtome.com", "dvcstable01.devtome.com"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable01.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable02.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable03.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable04.dvcnode.org"));
-        vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable05.dvcnode.org"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable06.dvcnode.org"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.org", "dvcstable07.dvcnode.org"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.com", "node01.dvcnode.com"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.com", "node02.dvcnode.com"));
-		vSeeds.push_back(CDNSSeedData("dvcnode.com", "node03.dvcnode.com"));
+        vSeeds.push_back(CDNSSeedData("ixcoin.co", "uk.ixcoin.co"));
+        vSeeds.push_back(CDNSSeedData("ixcoin.co", "nyc.ixcoin.co"));
+        vSeeds.push_back(CDNSSeedData("ixcoin.co", "sgp.ixcoin.co"));
 
         base58Prefixes[PUBKEY_ADDRESS] = list_of(0);
         base58Prefixes[SCRIPT_ADDRESS] = list_of(5);
@@ -190,10 +159,14 @@ static CTestNetParams testNetParams;
 class CRegTestParams : public CTestNetParams {
 public:
     CRegTestParams() {
-        pchMessageStart[0] = 'd';
-        pchMessageStart[1] = 'e';
-        pchMessageStart[2] = 'v';
-        pchMessageStart[3] = 'r';
+        pchMessageStart[0] = 0xfa;
+        pchMessageStart[1] = 0xbf;
+        pchMessageStart[2] = 0xb6;
+        pchMessageStart[3] = 0xdb;
+        pchMessageStart2[0] = 0xfa;
+        pchMessageStart2[1] = 0xbf;
+        pchMessageStart2[2] = 0xb6;
+        pchMessageStart2[3] = 0xdb;
         nSubsidyHalvingInterval = 150;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 1);
         genesis.nTime = 1296688602;
