@@ -127,41 +127,17 @@ public:
         pchMessageStart2[1] = 0xbf;
         pchMessageStart2[2] = 0xb6;
         pchMessageStart2[3] = 0xdb;
-
-        vAlertPubKey = ParseHex("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
+        strDataDir = "testnet";
         nDefaultPort = 53333;
         nRPCPort = 53332;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 28);
         nSubsidyHalvingInterval = 210000;
 
-        // Build the genesis block. Note that the output of the genesis coinbase cannot
-        // be spent as it did not originally exist in the database.
-        //
-		// Genesis Block:
-		// CBlock(hash=00000000de13b7f748fb, ver=1, hashPrevBlock=00000000000000000000, hashMerkleRoot=764fc5f8e5, nTime=1313457620, nBits=1d00ffff, nNonce=2831549010, vtx=1)
-		//   CTransaction(hash=764fc5f8e5, ver=1, vin.size=1, vout.size=1, nLockTime=0)
-		//    CTxIn(COutPoint(0000000000, -1), coinbase 04ffff001d01044931352f41676f2f32303131202d2044696172696f20456c20446961202d204f62616d612063616520616c2033392520656e206c61206170726f62616369f36e20636975646164616e61)
-		//    CTxOut(nValue=48.00000000, scriptPubKey=04678afdb0fe5548271967f1a67130)
-		//  vMerkleTree: 764fc5f8e5
-
-        const char* pszTimestamp = "To see the farm is to leave it";
-        CTransaction txNew;
-        txNew.vin.resize(1);
-        txNew.vout.resize(1);
-        txNew.vin[0].scriptSig = CScript() << 486604799 << CBigNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
-        txNew.vout[0].nValue = 50 * COIN;
-        txNew.vout[0].scriptPubKey = CScript() << ParseHex("04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11984") << OP_CHECKSIG;
-        genesis.vtx.push_back(txNew);
-        genesis.hashPrevBlock = 0;
-        genesis.hashMerkleRoot = genesis.BuildMerkleTree();
-        genesis.nVersion = 1;
-        genesis.nTime    = 1296688602;
-        genesis.nBits    = 0x1d00ffff;
-        genesis.nNonce   = 414098458;
+        genesis.nTime    = 1304113447;
+        genesis.nNonce   = 162700098;
 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000007199508e34a9ff81e6ec0c477a4cccff2a4767a8eee39c11db367b008"));
-        assert(genesis.hashMerkleRoot == uint256("0xcb3ae7b867c97ceb834c5d131355cd4bc176a44360fede9ed6d47b897397ba3f"));
+        assert(hashGenesisBlock == uint256("0x0000000e266692d6c16814490ca60acda9398727680325386bbdd98c61457a48"));
 
         vSeeds.push_back(CDNSSeedData("ixcoin.co", "uk.ixcoin.co"));
         vSeeds.push_back(CDNSSeedData("ixcoin.co", "nyc.ixcoin.co"));
