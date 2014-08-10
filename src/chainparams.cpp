@@ -68,7 +68,8 @@ public:
         genesis.nNonce   = 2245271137;
 
 	hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x0000000001534ef8893b025b9c1da67250285e35c9f76cae36a4904fdf72c591"));
+
+	assert(hashGenesisBlock == uint256("0x0000000001534ef8893b025b9c1da67250285e35c9f76cae36a4904fdf72c591"));
         assert(genesis.hashMerkleRoot == uint256("0xcb3ae7b867c97ceb834c5d131355cd4bc176a44360fede9ed6d47b897397ba3f"));
 
         vSeeds.push_back(CDNSSeedData("ixcoin.co", "uk.ixcoin.co"));
@@ -123,21 +124,17 @@ public:
         pchMessageStart[1] = 0xbf;
         pchMessageStart[2] = 0xb6;
         pchMessageStart[3] = 0xdb;
-        pchMessageStart2[0] = 0xfa;
-        pchMessageStart2[1] = 0xbf;
-        pchMessageStart2[2] = 0xb6;
-        pchMessageStart2[3] = 0xdb;
-        strDataDir = "testnet";
+        vAlertPubKey = ParseHex("");
         nDefaultPort = 53333;
         nRPCPort = 53332;
-        bnProofOfWorkLimit = CBigNum(~uint256(0) >> 28);
+	strDataDir = "testnet";
+        bnProofOfWorkLimit = CBigNum(~uint256(0) >> 30);
         nSubsidyHalvingInterval = 210000;
 
-        genesis.nTime    = 1304113447;
-        genesis.nNonce   = 162700098;
-
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x0000000e266692d6c16814490ca60acda9398727680325386bbdd98c61457a48"));
+        //genesis.print();
+        //assert(hashGenesisBlock == uint256("0x0000000e266692d6c16814490ca60acda9398727680325386bbdd98c61457a48")); //Old
+	assert(hashGenesisBlock == uint256("0x0000000001534ef8893b025b9c1da67250285e35c9f76cae36a4904fdf72c591"));
 
         vSeeds.push_back(CDNSSeedData("ixcoin.co", "uk.ixcoin.co"));
         vSeeds.push_back(CDNSSeedData("ixcoin.co", "nyc.ixcoin.co"));
