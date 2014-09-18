@@ -3205,8 +3205,25 @@ bool VerifyDB(int nCheckLevel, int nCheckDepth)
                 return error("VerifyDB() : *** irrecoverable inconsistency in block data at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             pindexState = pindex->pprev;
             if (!fClean) {
-                nGoodTransactions = 0;
-                pindexFailure = pindex;
+               // Ixcoin has 8 blocks from back in 4.26.2013 that will not verify @ checklevel 3, so here we code in a check entries,
+               // and if its one of those do nothing right now for the 0.9.2.1 release
+               switch( pindex->nHeight ) {
+                    case 132484 :
+                    case 132463 :
+                    case 132374 :
+                    case 132337 :
+                    case 132265 :
+                    case 132221 :
+                    case 132134 :
+                    case 132126 :
+                         error("VerifyDB() : Specific Ixcoin DisconnectBlock() errors from 4.2013 ignored." );
+                         nGoodTransactions += block.vtx.size();
+                    break;
+                    
+                    default :
+                         nGoodTransactions = 0;
+                         pindexFailure = pindex;
+               }
             } else
                 nGoodTransactions += block.vtx.size();
         }

@@ -1,6 +1,6 @@
 IXCoin 0.9.2 BETA
 
-Copyright (c) 2009-2014 IXCoin Core Developers
+Copyright (c) 2011-2014 IXCoin Core Developers
 
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -26,6 +26,7 @@ However, it downloads and stores the entire history of IXCoin transactions;
 depending on the speed of your computer and network connection, the synchronization
 process can take anywhere from a few hours to a day or more.
 
-See the ixcoin wiki at:
-  https://en.ixcoin.it/wiki/Main_Page
+As Ixcoin is very similar, the Best source of information can be found on the
+Bitcoin wiki at:
+  https://en.Bitcoin.it/wiki/Main_Page
 for more help and information.
