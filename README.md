@@ -15,7 +15,7 @@ out collectively by the network. IXCoin Core is the name of open source
 software which enables the use of this currency.
 
 For more information, as well as an immediately useable, binary version of
-the IXCoin Core software, see http://www.bitcoin.org/en/download.
+the IXCoin Core software, see http://www.ixcoin.org
 
 License
 -------
