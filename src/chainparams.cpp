@@ -126,7 +126,7 @@ public:
         pchMessageStart[3] = 0xdb;
         vAlertPubKey = ParseHex("");
         nDefaultPort = 53333;
-        nRPCPort = 53332;
+        nRPCPort = 53334;
 	strDataDir = "testnet";
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 30);
         nSubsidyHalvingInterval = 210000;
