@@ -10,6 +10,7 @@
 #include "protocol.h"
 #include "sync.h"
 #include "util.h"
+#include "alert.h"
 
 #include <boost/foreach.hpp>
 #include "json/json_spirit_value.h"
@@ -89,7 +90,7 @@ Value getpeerinfo(const Array& params, bool fHelp)
             "    \"pingtime\": n,             (numeric) ping time\n"
             "    \"pingwait\": n,             (numeric) ping wait\n"
             "    \"version\": v,              (numeric) The peer version, such as 7001\n"
-            "    \"subver\": \"/Satoshi:0.8.5/\",  (string) The string version\n"
+            "    \"subver\": \"/Satoshi:0.9.2/\",  (string) The string version\n"
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
             "    \"banscore\": n,              (numeric) The ban score (stats.nMisbehavior)\n"
@@ -352,6 +353,14 @@ Value getnetworkinfo(const Array& params, bool fHelp)
             "    \"address\": \"xxxx\",      (string) network address\n"
             "    \"port\": xxx,              (numeric) network port\n"
             "    \"score\": xxx              (numeric) relative score\n"
+            "  \"alerts\": [,                (array) list of alerts on network\n"
+            "    \"alertid\": \"xxx\",       (numeric) the ID number for this alert\n"
+            "    \"priority\": xxx,          (numeric) the alert priority\n"
+            "    \"minver\": xxx             (numeric) the minimum protocal version this effects\n"
+            "    \"maxver\": xxx             (numeric) the maximum protocal version this effects\n"
+            "    \"relayuntil\": xxx         (numeric) relay this alert to other nodes until this time\n"
+            "    \"expiration\": xxx         (numeric) when this alert will expire\n"
+            "    \"statusbar\": \"xxxx\",    (string) status bar & tooltip string displayed\n"
             "  ]\n"
             "}\n"
             "\nExamples:\n"
@@ -382,5 +391,141 @@ Value getnetworkinfo(const Array& params, bool fHelp)
         }
     }
     obj.push_back(Pair("localaddresses", localAddresses));
+    
+    // Add in the list of alerts currently on the network
+    Array localAlerts;
+    if( !mapAlerts.empty() ) {
+          // Parse all the alerts, and prepare a JSON response list          
+          LOCK(cs_mapAlerts);
+          for( map<uint256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end(); mi++ ) {
+               const CAlert& alert = (*mi).second;
+               Object rec;
+               rec.push_back( Pair("AlertID", alert.nID) );
+               rec.push_back( Pair("Priority", alert.nPriority) );
+               rec.push_back( Pair("MinVer", alert.nMinVer) );
+               rec.push_back( Pair("MaxVer", alert.nMaxVer) );
+               rec.push_back( Pair("RelayUntil", alert.nRelayUntil) );
+               rec.push_back( Pair("Expiration", alert.nExpiration) );
+               rec.push_back( Pair("StatusBar", alert.strStatusBar) );
+               localAlerts.push_back(rec);
+          }
+    }
+    obj.push_back(Pair("alerts", localAlerts));
+    
     return obj;
 }
+
+// Only build this code in preleases or test builds
+#if CLIENT_VERSION_IS_RELEASE != true
+//
+// This allows our developers and foundation to notify all nodes of any issues on the Ixcoin network
+//
+Value sendalert(const Array& params, bool fHelp)
+{
+    if (fHelp || params.size() < 6)
+        throw runtime_error(
+            "sendalert <message> <privatekey> <minver> <maxver> <priority> <id> [cancelupto] [relaydays] [expiredays]\n"
+            "<message> is the alert text message\n"
+            "<privatekey> is hex string of alert master private key\n"
+            "<minver> is the minimum applicable internal client version\n"
+            "<maxver> is the maximum applicable internal client version\n"
+            "<priority> is integer priority number\n"
+            "<id> is the alert id\n"
+            "[cancelupto] cancels all alert id's up to this number\n"
+            "[relaydays]  relay this alert for this many days\n"
+            "[expiredays] expire this alert in this many days\n"
+            "Returns JSON result if sucsessful.");
+
+    CAlert alert;
+    CKey key;
+
+    alert.strStatusBar = params[0].get_str();
+    alert.nMinVer = params[2].get_int();
+    alert.nMaxVer = params[3].get_int();
+    alert.nPriority = params[4].get_int();
+    alert.nID = params[5].get_int();
+    if (params.size() > 6)
+        alert.nCancel = params[6].get_int();
+    alert.nVersion = PROTOCOL_VERSION;
+
+    // Relay and don't expire this alert for one year, or the number of days given
+    const int64_t i64Days = 24*60*60;       // One day
+    const int64_t i64AlertNow = GetAdjustedTime();
+    alert.nRelayUntil = ( params.size() > 7 ) ? params[7].get_int() : 365;
+    alert.nRelayUntil *= i64Days;
+    alert.nRelayUntil += i64AlertNow;
+    
+    alert.nExpiration = ( params.size() > 8 ) ? params[8].get_int() : 365;
+    alert.nExpiration *= i64Days;
+    alert.nExpiration += i64AlertNow;
+
+    CDataStream sMsg(SER_NETWORK, PROTOCOL_VERSION);
+    sMsg << (CUnsignedAlert)alert;
+    alert.vchMsg = vector<unsigned char>(sMsg.begin(), sMsg.end());
+
+    // From https://bitcointalk.org/index.php?topic=50330.40:
+    //
+    // CKey::GetPrivKey and CKey::SetPrivKey are accessor methods for the 279-byte DES private key.
+    // CKey::GetSecret and CKey::SetSecret are accessor methods for the 32-byte private key.
+    //
+    // Those of you who are interested in the OpenSSL calls needed, it's all spelled out in key.h
+    //
+    //  If the SendAlert user is giving us the 32 byte secret code & we already know the public key, so...
+    //  Setup an object with the correct value for the private key, otherwise we'll assume they are giving us the
+    //  private key as the string value, and use that to create the key object.
+    //  Either of the above most be given, before this code can sign and then process the alert.
+    //
+    // There are various code fragments below that are commented out for release builds. Helpful however, for debugging
+    // changes to the code and/or keys being used.  Otherwise not needed
+    //
+    //  Move the SendAlert 2nd parmeter chars into a vector, whickever it is, can assume it's being given to us as hex pairs 
+    vector<unsigned char> vchPrivKey = ParseHex(params[1].get_str());
+    
+    if( vchPrivKey.size() == 32 ) {         // Then we're given only a 32-byte private key multipler
+        key.Set( vchPrivKey.begin(), vchPrivKey.end(), FALSE );
+        CPrivKey nPK = key.GetPrivKey();    // This calls openssl & sets the key structure up correctly.
+        // Print out the private key here, from being set by SecretBytes...
+        // std::string strKey;
+        // for( size_t i=0; i<nPK.size(); i++ )
+        //   strKey += strprintf( "%02x", nPK[i] );
+        // LogPrintf("SendAlert pass is the SecretBytes, Private Key Value is:\n%s\n", strKey);
+    }
+    else if( !key.SetPrivKey( CPrivKey(vchPrivKey.begin(), vchPrivKey.end()), FALSE ) )
+        throw runtime_error( "Unable to verify alert Private key, check private key?\n");  
+    // else
+    //     LogPrintf("SendAlert pass is the PrivateKey.\n");
+    
+    // Signed the message, sets the alert vchSig string.
+    if (!key.Sign(Hash(alert.vchMsg.begin(), alert.vchMsg.end()), alert.vchSig))
+        throw runtime_error( "Unable to sign alert, check private key?\n");  
+    else if(!alert.ProcessAlert()) 
+        throw runtime_error( "Failed to process alert.\n");
+    //
+    // If you need to, Print out the CAlert structure, into the log file here:
+    // alert.print();
+    //
+    // After we've called alert.ProcessAlert(), the public key will have been used to verify the 
+    // signature of the (now) signed alert message, or a runtime_error would have been returned.
+    
+    // Relay alert to the other nodes
+    {
+        LOCK(cs_vNodes);
+        BOOST_FOREACH(CNode* pnode, vNodes)
+            alert.RelayTo(pnode);
+    }
+    // At this point, the Ixcoin network will be flooded with the alert message before very much time has passed.
+
+    Object res;
+    res.push_back( Pair("AlertID", alert.nID) );
+    res.push_back( Pair("Priority", alert.nPriority) );
+    res.push_back( Pair("Version", alert.nVersion) );
+    res.push_back( Pair("MinVer", alert.nMinVer) );
+    res.push_back( Pair("MaxVer", alert.nMaxVer) );
+    res.push_back( Pair("RelayUntil", alert.nRelayUntil) );
+    res.push_back( Pair("Expiration", alert.nExpiration) );
+    res.push_back( Pair("StatusBar", alert.strStatusBar) );
+    if (alert.nCancel > 0)
+        res.push_back( Pair("Cancel", alert.nCancel) );
+    return res;
+}
+#endif

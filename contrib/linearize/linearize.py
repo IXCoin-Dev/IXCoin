@@ -8,15 +8,18 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #
-# A really nice aspect to this version of the linearizer, which builds your bootstrap.dat file, is that no
-# knowledge of the particulars about any given coin are required.  Only that it responds on the correct port
-# to getblockhash() and getblock() requests.  So it does require you have a working and running coin daemon
-# such as ixcoind.exe or ixcoin-qt -server or bitcoind.exe or whatever xcoind.exe you care to use.
+# A really nice aspect to this version of the linearizer, which builds your bootstrap.dat file,
+# is that NO knowledge of the particulars about any given coin are required.  Only that it
+# responds on the correct port to getblockhash() and getblock() requests.  
 #
-# NOTE: 9/17/2014 - This code has been ported & now runs within Python 3+ environments, originally coded for Python 2
-#                   for bitcoin, and has now been upgraded for use with Ixcoin builds & releases.
-#                   Allot of work 'needs' to be done, in order to have even the most elementary error handling.
-#                   However, once setup correctly it will get the job done!
+# It DOES require you have a working and running coin daemon such as ixcoind.exe or
+# ixcoin-qt -server or bitcoind.exe or whatever xyzcoind.exe you care to use.
+#
+# NOTE: 9/17/2014 - 
+#   This code has been ported & now runs within Python 3+ environments, originally coded
+#   for Python 2 in bitcoin, it has now been upgraded for use with Ixcoin builds & releases.
+#   Allot of work 'needs' to be done, in order to have even the most elementary
+#   of error handling.  However, once setup correctly, it will get the job done!
 #
 
 import json
@@ -138,7 +141,7 @@ if __name__ == '__main__':
     # As we still have 20+ days to go, this would generate an error and must be reduced until then.
     if 'max_height' not in settings:
         # settings['max_height'] = 227499
-        settings['max_height'] = 223240
+        settings['max_height'] = 225365
     if 'rpcuser' not in settings or 'rpcpassword' not in settings:
         print("Missing username and/or password in cfg file")
         sys.exit(1)

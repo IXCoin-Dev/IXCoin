@@ -159,22 +159,27 @@ string CRPCTable::help(string strCommand) const
             continue;
 #endif
 
-        try
-        {
+#if CLIENT_VERSION_IS_RELEASE != true
+        if( strMethod != "sendalert" )          // Don't show this command to everyone using the client
+#endif
+        {       
+          try
+          {
             Array params;
             rpcfn_type pfn = pcmd->actor;
             if (setDone.insert(pfn).second)
                 (*pfn)(params, true);
-        }
-        catch (std::exception& e)
-        {
+          }
+          catch (std::exception& e)
+          {
             // Help text is returned in an exception
             string strHelp = string(e.what());
             if (strCommand == "")
                 if (strHelp.find('\n') != string::npos)
                     strHelp = strHelp.substr(0, strHelp.find('\n'));
             strRet += strHelp + "\n";
-        }
+          }
+       }
     }
     if (strRet == "")
         strRet = strprintf("help: unknown command: %s\n", strCommand);
@@ -270,7 +275,10 @@ static const CRPCCommand vRPCCommands[] =
     { "createmultisig",         &createmultisig,         true,      true ,      false },
     { "validateaddress",        &validateaddress,        true,      false,      false }, /* uses wallet if enabled */
     { "verifymessage",          &verifymessage,          false,     false,      false },
+// Only build this code in preleases or test builds
+#if CLIENT_VERSION_IS_RELEASE != true
     { "sendalert",              &sendalert,              false,     false,      false }, /* So client can sendalerts if the private key is known */
+#endif
 
 #ifdef ENABLE_WALLET
     /* Wallet */
