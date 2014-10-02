@@ -3466,9 +3466,20 @@ string GetWarnings(string strFor)
     if (GetBoolArg("-testsafemode", false))
         strRPC = "test";
 
+    // Ixcoin uses this feature for initial 'Pre-Release' builds, when your production code is finished,
+    // be sure to change this value to 'true', by setting it in the configure.ac file.  Then reconfigure & build all
+    // from the source code.  The sendalert' command functionally is ONLY included for pre-release builds, it is not
+    // included in final production builds.  This is how Bitcoin is released, there is NO 'sendalert' command function
+    // available to clients.
     if (!CLIENT_VERSION_IS_RELEASE)
         strStatusBar = _("This is a pre-release test build - use at your own risk - do not use for mining or merchant applications");
+        // The piority of this message remains @ 0, yet if nothing else is found, it will be displayed by default for pre-release builds.
 
+    // Check for some high priority items to watch out for:
+    
+    // These nPriority values set an upper limit on what should be used by the development team, when issuing alert messages,
+    // as they are more important than anything else to this client's user..
+    
     // Misc warnings like out of disk space and clock is wrong
     if (strMiscWarning != "")
     {
@@ -3488,6 +3499,11 @@ string GetWarnings(string strFor)
     }
 
     // Alerts
+    // Any network wide alerts that have shown up, and have a greater priority
+    // than what is listed above, will now be checked and the highest 
+    // priorty one is picked & shown to the user.
+    // NOTE: If two alerts have the same priority, it will be the 1st one
+    //       found, that gets shown to the user.
     {
         LOCK(cs_mapAlerts);
         BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)

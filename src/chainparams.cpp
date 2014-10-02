@@ -37,7 +37,14 @@ public:
 	pchMessageStart2[1] = 0xba;
 	pchMessageStart2[2] = 0xb6;
 	pchMessageStart2[3] = 0xdb;
-        vAlertPubKey = ParseHex("02a9e38d69128d1e9b689a02bb0e67927ef9aff27b62e7b0ecddec2a07ad587ad6");
+	//
+	// Starting with Ixcoin v0.9.2.1, the following vAlertPubKey ECDSA (Ecliptical Curve DSA) hex value will be used
+	// The private key is not publicly available. This allows only a small group to generate Alert messages on the IXCoin Network:  
+	// As of 9/30/2014  Holders of the private key are: AhmedBodi, GroundRod, several more parties are expected to also be included.
+	//   If an alert is necessary, this can be used to inform all nodes of an important chain development or software upgrade
+	//
+        vAlertPubKey = ParseHex("046bcc6984f841c35686e7b9ed7b2ce5b2f4cc8b8a5ef314870e623566f8b8f9d0d7b906c4537c0d5ca55c53b9e2d38834d7c5e5846c50bdced192c105cc83a589");
+        
         nDefaultPort = 8337;
         nRPCPort = 8338;
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 32);
@@ -124,9 +131,12 @@ public:
         pchMessageStart[1] = 0xbf;
         pchMessageStart[2] = 0xb6;
         pchMessageStart[3] = 0xdb;
-        vAlertPubKey = ParseHex("");
+        vAlertPubKey = ParseHex("04de6b00e3294afc25e03eead3fdb7b0dc9ebdf972625e40d79df84766c96a6ddfe8ae702c71f073ffa74fe69effd61ff7b27e8ceae2ac780cc786c278b270cffc");
+        // Use this Private key for testnet 'sendalert' commands
+        // "308201130201010420792aeda8e312f4e1b26861e3d16a19cd01b45c5531c1d90a9d180335a28d3bc0a081a53081a2020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101a14403420004de6b00e3294afc25e03eead3fdb7b0dc9ebdf972625e40d79df84766c96a6ddfe8ae702c71f073ffa74fe69effd61ff7b27e8ceae2ac780cc786c278b270cffc"
+        
         nDefaultPort = 53333;
-        nRPCPort = 53334;
+        nRPCPort = 53332;
 	strDataDir = "testnet";
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 30);
         nSubsidyHalvingInterval = 210000;
