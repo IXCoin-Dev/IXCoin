@@ -1,6 +1,7 @@
 IXCoin Core integration/staging tree
 =====================================
 
+Copyright (c) 2009-2014 Bitcoin Core Developers
 Copyright (c) 2011-2014 IXCoin Core Developers
 
 What is IXCoin?
@@ -16,7 +17,8 @@ carried out collectively by the network.
 IXCoin Core is the name of this open source software which enables the use of
 that currency.
 
-For more information, see https://bitcointalk.org/index.php?topic=230141
+For more information, see the Ixcoin To-Do Thread @
+https://bitcointalk.org/index.php?topic=230141
 
 A new IXcoin Foundation has recently formed in 2014, this is ongoing, with the
 intention that the orignal http://www.ixcoin.org website be maintained and

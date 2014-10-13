@@ -191,7 +191,7 @@ bool PaymentServer::ipcParseCommandLine(int argc, char* argv[])
             savedPaymentRequests.append(arg);
 
             SendCoinsRecipient r;
-            if (GUIUtil::parseIXCoinURI(arg, &r))
+            if (GUIUtil::parseIXCoinURI(arg, &r) && !r.address.isEmpty())
             {
                 CIXCoinAddress address(r.address.toStdString());
 

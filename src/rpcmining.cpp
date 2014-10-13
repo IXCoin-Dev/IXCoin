@@ -408,7 +408,7 @@ Value getblocktemplate(const Array& params, bool fHelp)
             "getblocktemplate ( \"jsonrequestobject\" )\n"
             "\nIf the request parameters include a 'mode' key, that is used to explicitly select between the default 'template' request or a 'proposal'.\n"
             "It returns data needed to construct a block to work on.\n"
-            "See https://en.ixcoin.it/wiki/BIP_0022 for full specification.\n"
+            "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.\n"
 
             "\nArguments:\n"
             "1. \"jsonrequestobject\"       (string, optional) A json object in the following spec\n"
@@ -596,7 +596,7 @@ Value submitblock(const Array& params, bool fHelp)
             "submitblock \"hexdata\" ( \"jsonparametersobject\" )\n"
             "\nAttempts to submit new block to network.\n"
             "The 'jsonparametersobject' parameter is currently ignored.\n"
-            "See https://en.ixcoin.it/wiki/BIP_0022 for full specification.\n"
+            "See https://en.bitcoin.it/wiki/BIP_0022 for full specification.\n"
 
             "\nArguments\n"
             "1. \"hexdata\"    (string, required) the hex-encoded block data to submit\n"
@@ -628,6 +628,7 @@ Value submitblock(const Array& params, bool fHelp)
     return Value::null;
 }
 
+// The following are Ixcoin specific functions for a merged mined coin.
 
 Value getworkaux(const Array& params, bool fHelp)
 {
@@ -866,7 +867,10 @@ Value getauxblock(const Array& params, bool fHelp)
 			// Need to update only after we know CreateNewBlock succeeded
             pindexPrev = pindexPrevNew;
             // Push OP_2 just in case we want versioning later
-            pblock->vtx[0].vin[0].scriptSig = CScript() << pblock->nBits << CBigNum(1) << OP_2;
+            // FIXME: Debugging 9.3 upgrade build problem, commenting out this line fixed it (GR)
+            // the problem is related to use of CBigNum, they are no longer referenced in script objects
+            //pblock->vtx[0].vin[0].scriptSig = CScript() << pblock->nBits << CBigNum(1) << OP_2;
+
             pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 			CAuxPow *blockAuxPow = new CAuxPow();
             // Sets the version

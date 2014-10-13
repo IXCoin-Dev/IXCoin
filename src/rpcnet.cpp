@@ -90,7 +90,7 @@ Value getpeerinfo(const Array& params, bool fHelp)
             "    \"pingtime\": n,             (numeric) ping time\n"
             "    \"pingwait\": n,             (numeric) ping wait\n"
             "    \"version\": v,              (numeric) The peer version, such as 7001\n"
-            "    \"subver\": \"/Satoshi:0.9.2/\",  (string) The string version\n"
+            "    \"subver\": \"/Satoshi:0.9.3/\",  (string) The string version\n"
             "    \"inbound\": true|false,     (boolean) Inbound (true) or Outbound (false)\n"
             "    \"startingheight\": n,       (numeric) The starting height (block) of the peer\n"
             "    \"banscore\": n,              (numeric) The ban score (stats.nMisbehavior)\n"
@@ -424,16 +424,16 @@ Value sendalert(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 6)
         throw runtime_error(
-            "sendalert <message> <privatekey> <minver> <maxver> <priority> <id> [cancelupto] [relaydays] [expiredays]\n"
+            "sendalert <message> <privatekey> <minver> <maxver> <priority> <id> [relaydays] [expiredays] [cancelupto]\n"
             "<message> is the alert text message\n"
             "<privatekey> is hex string of alert master private key\n"
             "<minver> is the minimum applicable internal client version\n"
             "<maxver> is the maximum applicable internal client version\n"
             "<priority> is integer priority number\n"
             "<id> is the alert id\n"
-            "[cancelupto] cancels all alert id's up to this number\n"
             "[relaydays]  relay this alert for this many days\n"
             "[expiredays] expire this alert in this many days\n"
+            "[cancelupto] cancels all alert id's up to this number\n"
             "Returns JSON result if sucsessful.");
 
     CAlert alert;
@@ -444,18 +444,18 @@ Value sendalert(const Array& params, bool fHelp)
     alert.nMaxVer = params[3].get_int();
     alert.nPriority = params[4].get_int();
     alert.nID = params[5].get_int();
-    if (params.size() > 6)
-        alert.nCancel = params[6].get_int();
+    if (params.size() > 8)
+        alert.nCancel = params[8].get_int();
     alert.nVersion = PROTOCOL_VERSION;
 
     // Relay and don't expire this alert for one year, or the number of days given
     const int64_t i64Days = 24*60*60;       // One day
     const int64_t i64AlertNow = GetAdjustedTime();
-    alert.nRelayUntil = ( params.size() > 7 ) ? params[7].get_int() : 365;
+    alert.nRelayUntil = ( params.size() > 6 ) ? params[6].get_int() : 365;
     alert.nRelayUntil *= i64Days;
     alert.nRelayUntil += i64AlertNow;
     
-    alert.nExpiration = ( params.size() > 8 ) ? params[8].get_int() : 365;
+    alert.nExpiration = ( params.size() > 7 ) ? params[7].get_int() : 365;
     alert.nExpiration *= i64Days;
     alert.nExpiration += i64AlertNow;
 

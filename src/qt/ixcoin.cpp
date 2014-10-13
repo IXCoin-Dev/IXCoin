@@ -475,6 +475,9 @@ int main(int argc, char *argv[])
 #endif
 
     Q_INIT_RESOURCE(ixcoin);
+
+    GUIUtil::SubstituteFonts();
+
     IXCoinApplication app(argc, argv);
 #if QT_VERSION > 0x050100
     // Generate high-dpi pixmaps
