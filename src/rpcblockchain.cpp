@@ -308,17 +308,11 @@ Value getblock(const Array& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
 
     CBlock block;
-	Object ret;
-	try
-	{
-		CBlockIndex* pblockindex = mapBlockIndex[hash];
-		ReadBlockFromDisk(block, pblockindex);
-		ret = blockToJSON(block, pblockindex); 
-	}
+    CBlockIndex* pblockindex = mapBlockIndex[hash];
 
-    catch (std::exception &e) {
-        throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "getblock failed");
-    }
+    if(!ReadBlockFromDisk(block, pblockindex))
+        throw JSONRPCError(RPC_INTERNAL_ERROR, "Can't read block from disk");
+
     if (!fVerbose)
     {
         CDataStream ssBlock(SER_NETWORK, PROTOCOL_VERSION);
@@ -327,7 +321,7 @@ Value getblock(const Array& params, bool fHelp)
         return strHex;
     }
 
-    return ret;
+    return blockToJSON(block, pblockindex);
 }
 
 Value gettxoutsetinfo(const Array& params, bool fHelp)
@@ -457,8 +451,8 @@ Value verifychain(const Array& params, bool fHelp)
             "\nResult:\n"
             "true|false       (boolean) Verified or not\n"
             "\nExamples:\n"
-            + HelpExampleCli("verifychain", "")
-            + HelpExampleRpc("verifychain", "")
+            + HelpExampleCli("verifychain", "2, 0")
+            + HelpExampleRpc("verifychain", "2, 0")
         );
 
     int nCheckLevel = GetArg("-checklevel", 3);

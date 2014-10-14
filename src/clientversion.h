@@ -4,28 +4,29 @@
 #if defined(HAVE_CONFIG_H)
 #include "ixcoin-config.h"
 
-// GR Note: Commenting this code out on 9/28/2014, if it was ever used it may NOT match what is used
-// throughout the rest of the build process:
+// GR Note: These are needed to build the ixcoind-res.rc object file,
+// manually keep these the same as the rest of your build process!
 // See configure.ac, to set these values up, as the ixcoin-config.h
-// file is built with these values defined as required by the developer
+// file, used in compiling the source files, is built with the values
+// defined there, not here.
 //
-// #else
+#else
 //
 // client versioning and copyright year
 //
 
 // These need to be macros, as version.cpp's and ixcoin-qt.rc's voodoo requires it
-// #define CLIENT_VERSION_MAJOR       0
-// #define CLIENT_VERSION_MINOR       9
-// #define CLIENT_VERSION_REVISION    2
-// #define CLIENT_VERSION_BUILD       1
+#define CLIENT_VERSION_MAJOR       0
+#define CLIENT_VERSION_MINOR       9
+#define CLIENT_VERSION_REVISION    3
+#define CLIENT_VERSION_BUILD       0
 
 // Set to true for release, false for prerelease or test build
-// #define CLIENT_VERSION_IS_RELEASE  true
+#define CLIENT_VERSION_IS_RELEASE  false
 
 // Copyright year (2011-this)
 // Todo: update this when changing our copyright comments in the source
-// #define COPYRIGHT_YEAR 2014
+#define COPYRIGHT_YEAR 2014
 
 #endif //HAVE_CONFIG_H
 
