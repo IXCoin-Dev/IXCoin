@@ -274,7 +274,7 @@ std::string HelpMessageCli(bool mainProgram)
     }
 
     strUsage += "  -rpcconnect=<ip>       " + _("Send commands to node running on <ip> (default: 127.0.0.1)") + "\n";
-    strUsage += "  -rpcport=<port>        " + _("Connect to JSON-RPC on <port> (default: 8337 or testnet: 53333)") + "\n";
+    strUsage += "  -rpcport=<port>        " + _("Connect to JSON-RPC on <port> (default: 8337 or testnet: 18337)") + "\n";
     strUsage += "  -rpcwait               " + _("Wait for RPC server to start") + "\n";
 
     if(mainProgram)
