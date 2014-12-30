@@ -40,6 +40,7 @@ namespace Checkpoints
     static MapCheckpoints mapCheckpoints =
         boost::assign::map_list_of
 	(  4500,  uint256("0x00000000de37be98ca45cf0613fa2a321eba28e237543f9fee9b6a7605d03a94"))
+	( 198007, uint256("0x00fdfc9130416482887e4d56f89f4568c2f4d7764d14cc66833503f31a6ac73d"))
 	;
 
     /* Devcoin had not testnet checkblocks, if they even start to exist, they can be added here */
@@ -48,7 +49,7 @@ namespace Checkpoints
 	;
     static const CCheckpointData data = {
         &mapCheckpoints,
-        1304113447, // * UNIX timestamp of last checkpoint block
+        1397025619, // * UNIX timestamp of last checkpoint block
         936858,     // * total number of transactions between genesis and last checkpoint
                     //   (the tx=... number in the SetBestChain debug.log lines)
         1000.0      // * estimated number of transactions per day after checkpoint
