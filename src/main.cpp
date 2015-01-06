@@ -1447,12 +1447,13 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return nProofOfWorkLimit;
 
     const int height = pindexLast->nHeight + 1;
-
-//okay, maybe not this line
-    if (height > 0 ) // perform the IXC version always
+   //okay, maybe not this line
+   if (!TestNet() && height > 0 ) // perform the IXC version always
+	LogPrintf("Height Over 0 returning IXC diff algo");
        return GetNextWorkRequired_IXC(pindexLast);
+
    //hardcoded switch to 256.0 difficulty at block 14639 @TODO - when to change
-   if (height == 14640)
+   if (!TestNet() && height == 14640)
        return 0x1C00FFFF;
 
     // Only change once per interval
