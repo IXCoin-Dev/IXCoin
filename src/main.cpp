@@ -1281,10 +1281,6 @@ static int64 nInterval = nTargetTimespan / nTargetSpacing;
 unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime)
 {
     const CBigNum &bnLimit = Params().ProofOfWorkLimit();
-    // Testnet has min-difficulty blocks
-    // after nTargetSpacing*2 time between blocks:
-    if (TestNet() && nTime > nTargetSpacing*2)
-        return bnLimit.GetCompact();
 
     CBigNum bnResult;
     bnResult.SetCompact(nBase);
@@ -1299,7 +1295,6 @@ unsigned int ComputeMinWork(unsigned int nBase, int64_t nTime)
         bnResult = bnLimit;
     return bnResult.GetCompact();
 }
-
 // Return the target (difficulty) to the new block based on the pindexLast block
 unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlockHeader *pblock)
 {
@@ -1325,7 +1320,6 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
 		for (int i = 0; pindexFirst && i < nRemaining-1; i++)
 			pindexFirst = pindexFirst->pprev;
 		assert(pindexFirst);
-
 		int64 rema = GetAdjustedTime() - pindexFirst->GetBlockTime();
 		
 		if(rema < nTargetTimespan)
@@ -1447,37 +1441,19 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         return nProofOfWorkLimit;
 
     const int height = pindexLast->nHeight + 1;
-   //okay, maybe not this line
-   if (!TestNet() && height > 0 ) // perform the IXC version always
-	LogPrintf("Height Over 0 returning IXC diff algo");
-       return GetNextWorkRequired_IXC(pindexLast);
 
+//okay, maybe not this line
+    if (height > 0 ) // perform the IXC version always
+       return GetNextWorkRequired_IXC(pindexLast);
    //hardcoded switch to 256.0 difficulty at block 14639 @TODO - when to change
-   if (!TestNet() && height == 14640)
+   if (height == 14640)
        return 0x1C00FFFF;
 
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
     {
-        // Special difficulty rule for testnet:
-        if (TestNet())
-        {
-            // If the new block's timestamp is more than 2* 10 minutes
-            // then allow mining of a min-difficulty block.
-            if (pblock->nTime > pindexLast->nTime + nTargetSpacing*2)
-                return nProofOfWorkLimit;
-            else
-            {
-                // Return the last non-special-min-difficulty-rules-block
-                const CBlockIndex* pindex = pindexLast;
-                while (pindex->pprev && pindex->nHeight % nInterval != 0 && pindex->nBits == bnLimit)
-                    pindex = pindex->pprev;
-                return pindex->nBits;
-            }
-        }
-
        return pindexLast->nBits;
-   }
+    }
 
 
     // This fixes an issue where a 51% attack can change difficulty at will.
@@ -1736,10 +1712,6 @@ void static InvalidBlockFound(CBlockIndex *pindex, const CValidationState &state
 void UpdateTime(CBlockHeader& block, const CBlockIndex* pindexPrev)
 {
     block.nTime = max(pindexPrev->GetMedianTimePast()+1, GetAdjustedTime());
-
-    // Updating time can change work required on testnet:
-    if (TestNet())
-        block.nBits = GetNextWorkRequired(pindexPrev, &block);
 }
 
 void UpdateCoins(const CTransaction& tx, CValidationState &state, CCoinsViewCache &inputs, CTxUndo &txundo, int nHeight, const uint256 &txhash)
