@@ -482,7 +482,7 @@ Value sendalert(const Array& params, bool fHelp)
     vector<unsigned char> vchPrivKey = ParseHex(params[1].get_str());
     
     if( vchPrivKey.size() == 32 ) {         // Then we're given only a 32-byte private key multipler
-        key.Set( vchPrivKey.begin(), vchPrivKey.end(), FALSE );
+        key.Set( vchPrivKey.begin(), vchPrivKey.end(), false );
         CPrivKey nPK = key.GetPrivKey();    // This calls openssl & sets the key structure up correctly.
         // Print out the private key here, from being set by SecretBytes...
         // std::string strKey;
@@ -490,7 +490,7 @@ Value sendalert(const Array& params, bool fHelp)
         //   strKey += strprintf( "%02x", nPK[i] );
         // LogPrintf("SendAlert pass is the SecretBytes, Private Key Value is:\n%s\n", strKey);
     }
-    else if( !key.SetPrivKey( CPrivKey(vchPrivKey.begin(), vchPrivKey.end()), FALSE ) )
+    else if( !key.SetPrivKey( CPrivKey(vchPrivKey.begin(), vchPrivKey.end()), false ) )
         throw runtime_error( "Unable to verify alert Private key, check private key?\n");  
     // else
     //     LogPrintf("SendAlert pass is the PrivateKey.\n");
