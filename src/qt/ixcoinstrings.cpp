@@ -46,7 +46,7 @@ QT_TRANSLATE_NOOP("ixcoin-core", ""
 "Enter regression test mode, which uses a special chain in which blocks can "
 "be solved instantly."),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
-"Error: Listening for incoming connections failed (listen returned error %d)"),
+"Error: Listening for incoming connections failed (listen returned error %s)"),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
 "Error: The transaction was rejected! This might happen if some of the coins "
 "in your wallet were already spent, such as if you used a copy of wallet.dat "
@@ -75,12 +75,15 @@ QT_TRANSLATE_NOOP("ixcoin-core", ""
 "In this mode -genproclimit controls how many blocks are generated "
 "immediately."),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
-"Listen for JSON-RPC connections on <port> (default: 8337 or testnet: 53333)"),
+"Listen for JSON-RPC connections on <port> (default: 8337 or testnet: 18337)"),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
 "Number of seconds to keep misbehaving peers from reconnecting (default: "
 "86400)"),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
 "Output debugging information (default: 0, supplying <category> is optional)"),
+QT_TRANSLATE_NOOP("ixcoin-core", ""
+"Query for peer addresses via DNS lookup, if low on addresses (default: 1 "
+"unless -connect)"),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
 "Set maximum size of high-priority/low-fee transactions in bytes (default: %d)"),
 QT_TRANSLATE_NOOP("ixcoin-core", ""
@@ -130,9 +133,8 @@ QT_TRANSLATE_NOOP("ixcoin-core", "Accept connections from outside (default: 1 if
 QT_TRANSLATE_NOOP("ixcoin-core", "Add a node to connect to and attempt to keep the connection open"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Allow DNS lookups for -addnode, -seednode and -connect"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Allow JSON-RPC connections from specified IP address"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Always query for peer addresses via DNS lookup (default: 0)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Attempt to recover private keys from a corrupt wallet.dat"),
-QT_TRANSLATE_NOOP("ixcoin-core", "IXCoin Core Daemon"),
-QT_TRANSLATE_NOOP("ixcoin-core", "IXCoin Core RPC client version"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Block creation options:"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Cannot downgrade wallet"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Cannot resolve -bind address: '%s'"),
@@ -141,7 +143,7 @@ QT_TRANSLATE_NOOP("ixcoin-core", "Cannot write default address"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Clear list of wallet transactions (diagnostic tool; implies -rescan)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Connect only to the specified node(s)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Connect through SOCKS proxy"),
-QT_TRANSLATE_NOOP("ixcoin-core", "Connect to JSON-RPC on <port> (default: 8337 or testnet: 53333)"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Connect to JSON-RPC on <port> (default: 8337 or testnet: 18337)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Connect to a node to retrieve peer addresses, and disconnect"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Connection options:"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Corrupted block database detected"),
@@ -175,16 +177,18 @@ QT_TRANSLATE_NOOP("ixcoin-core", "Failed to write transaction index"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Failed to write undo data"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Fee per kB to add to transactions you send"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Fees smaller than this are considered zero fee (for relaying) (default:"),
-QT_TRANSLATE_NOOP("ixcoin-core", "Find peers using DNS lookup (default: 1 unless -connect)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Force safe mode (default: 0)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Generate coins (default: 0)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Get help for a command"),
 QT_TRANSLATE_NOOP("ixcoin-core", "How many blocks to check at startup (default: 288, 0 = all)"),
+QT_TRANSLATE_NOOP("ixcoin-core", "IXCoin Core Daemon"),
+QT_TRANSLATE_NOOP("ixcoin-core", "IXCoin Core RPC client version"),
 QT_TRANSLATE_NOOP("ixcoin-core", "If <category> is not supplied, output all debugging information."),
 QT_TRANSLATE_NOOP("ixcoin-core", "Importing..."),
 QT_TRANSLATE_NOOP("ixcoin-core", "Imports blocks from external blk000??.dat file"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Incorrect or no genesis block found. Wrong datadir for network?"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Information"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Initialization sanity check failed. Ixcoin Core is shutting down."),
 QT_TRANSLATE_NOOP("ixcoin-core", "Insufficient funds"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Invalid -onion address: '%s'"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Invalid -proxy address: '%s'"),
@@ -192,9 +196,11 @@ QT_TRANSLATE_NOOP("ixcoin-core", "Invalid amount for -minrelaytxfee=<amount>: '%
 QT_TRANSLATE_NOOP("ixcoin-core", "Invalid amount for -mintxfee=<amount>: '%s'"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Invalid amount for -paytxfee=<amount>: '%s'"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Invalid amount"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Keep at most <n> unconnectable blocks in memory (default: %u)"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Keep at most <n> unconnectable transactions in memory (default: %u)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Limit size of signature cache to <n> entries (default: 50000)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "List commands"),
-QT_TRANSLATE_NOOP("ixcoin-core", "Listen for connections on <port> (default: 8337 or testnet: 53333)"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Listen for connections on <port> (default: 8337 or testnet: 18337)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Loading addresses..."),
 QT_TRANSLATE_NOOP("ixcoin-core", "Loading block index..."),
 QT_TRANSLATE_NOOP("ixcoin-core", "Loading wallet..."),
@@ -254,7 +260,7 @@ QT_TRANSLATE_NOOP("ixcoin-core", "To use the %s option"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Transaction amount too small"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Transaction amounts must be positive"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Transaction too large"),
-QT_TRANSLATE_NOOP("ixcoin-core", "Unable to bind to %s on this computer (bind returned error %d, %s)"),
+QT_TRANSLATE_NOOP("ixcoin-core", "Unable to bind to %s on this computer (bind returned error %s)"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Unknown -socks proxy version requested: %i"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Unknown network specified in -onlynet: '%s'"),
 QT_TRANSLATE_NOOP("ixcoin-core", "Upgrade wallet to latest format"),

@@ -1,5 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2011-2014 The Ixcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -7,10 +8,11 @@
 #define IXCOIN_MAIN_H
 
 #if defined(HAVE_CONFIG_H)
-#include "ixcoin-config.h"
+#include "config/ixcoin-config.h"
 #endif
 
 #include "bignum.h"
+#include "clientversion.h"
 #include "chainparams.h"
 #include "coins.h"
 #include "net.h"
@@ -18,6 +20,8 @@
 #include "sync.h"
 #include "txmempool.h"
 #include "uint256.h"
+#include "version.h"
+
 #include <algorithm>
 #include <exception>
 #include <map>
