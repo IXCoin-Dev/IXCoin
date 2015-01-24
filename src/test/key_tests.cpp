@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2013 The IXCoin Core developers
+// Copyright (c) 2012-2015 The IXCoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,69 +16,42 @@
 
 using namespace std;
 
-static const string strSecret1     ("5HxWvvfubhXpYYpS3tJkw6fq9jE9j18THftkZjHHfmFiWtmAbrj");
-static const string strSecret2     ("5KC4ejrDjv152FGwP386VD1i2NYc5KkfSMyv1nGy1VGDxGHqVY3");
-static const string strSecret1C    ("Kwr371tjA9u2rFSMZjTNun2PXXP3WPZu2afRHTcta6KxEUdm1vEw");
-static const string strSecret2C    ("L3Hq7a8FEQwJkW1M2GNKDW28546Vp5miewcCzSqUD9kCAXrJdS3g");
-static const CIXCoinAddress addr1 ("1QFqqMUD55ZV3PJEJZtaKCsQmjLT6JkjvJ");
-static const CIXCoinAddress addr2 ("1F5y5E5FMc5YzdJtB9hLaUe43GDxEKXENJ");
-static const CIXCoinAddress addr1C("1NoJrossxPBKfCHuJXT4HadJrXRE9Fxiqs");
-static const CIXCoinAddress addr2C("1CRj2HyM1CXWzHAXLQtiGLyggNT9WQqsDs");
+static const string strSecret1     ("5J2q28LXA6qGXaEuhsALgtZtjrjrC7LkHgnJ9woHnLsVxJLGTG9");
+static const string strSecret2     ("5JoqT82S4CVGBfEEn3mivaMkQUhXkGRMdsv9aVutFw8CuRR3NQw");
+static const string strSecret1C    ("Kxn4P9movMsG4e3bX8DpuhQNX8SbApYBW3HVUKJf9pbo8LMEUyeQ");
+static const string strSecret2C    ("KwiPgc595nrZNQjyuA1zibfw57ie8Nn85WnmtzaWZKyAtMQhYrh7");
+
+static const CIXCoinAddress addr1("xfVJTeGKvgiqNxCU7LvgJfv4uCUYAs3Eaf");
+static const CIXCoinAddress addr2("xqHFELGebNdqFZJTPKckpNZJjWCZC97wpN");
+static const CIXCoinAddress addr1C("xgNt7ZyNjjTLGQLMVnR9dRG5Xs1gKvFk4u");
+static const CIXCoinAddress addr2C("xjHD5DAQK5umYA1v3f4fo72WuETu7e6xJ6");
 
 
-static const string strAddressBad("1HV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF");
-
-
-#ifdef KEY_TESTS_DUMPINFO
-void dumpKeyInfo(uint256 privkey)
-{
-    CKey key;
-    key.resize(32);
-    memcpy(&secret[0], &privkey, 32);
-    vector<unsigned char> sec;
-    sec.resize(32);
-    memcpy(&sec[0], &secret[0], 32);
-    printf("  * secret (hex): %s\n", HexStr(sec).c_str());
-
-    for (int nCompressed=0; nCompressed<2; nCompressed++)
-    {
-        bool fCompressed = nCompressed == 1;
-        printf("  * %s:\n", fCompressed ? "compressed" : "uncompressed");
-        CIXCoinSecret bsecret;
-        bsecret.SetSecret(secret, fCompressed);
-        printf("    * secret (base58): %s\n", bsecret.ToString().c_str());
-        CKey key;
-        key.SetSecret(secret, fCompressed);
-        vector<unsigned char> vchPubKey = key.GetPubKey();
-        printf("    * pubkey (hex): %s\n", HexStr(vchPubKey).c_str());
-        printf("    * address (base58): %s\n", CIXCoinAddress(vchPubKey).ToString().c_str());
-    }
-}
-#endif
-
+static const string strAddressBad("xHV9Lc3sNHZxwj4Zk6fB38tEmBryq2cBiF");
 
 BOOST_AUTO_TEST_SUITE(key_tests)
 
 BOOST_AUTO_TEST_CASE(key_test1)
 {
     CIXCoinSecret bsecret1, bsecret2, bsecret1C, bsecret2C, baddress1;
-    BOOST_CHECK( bsecret1.SetString (strSecret1));
-    BOOST_CHECK( bsecret2.SetString (strSecret2));
+
+    BOOST_CHECK( bsecret1.SetString(strSecret1));
+    BOOST_CHECK( bsecret2.SetString(strSecret2));
     BOOST_CHECK( bsecret1C.SetString(strSecret1C));
     BOOST_CHECK( bsecret2C.SetString(strSecret2C));
     BOOST_CHECK(!baddress1.SetString(strAddressBad));
 
     CKey key1  = bsecret1.GetKey();
-    BOOST_CHECK(key1.IsCompressed() == false);
-    CKey key2  = bsecret2.GetKey();
+	BOOST_CHECK(key1.IsCompressed() == false);
+    CKey key2  = bsecret2.GetKey();    
     BOOST_CHECK(key2.IsCompressed() == false);
     CKey key1C = bsecret1C.GetKey();
     BOOST_CHECK(key1C.IsCompressed() == true);
     CKey key2C = bsecret2C.GetKey();
-    BOOST_CHECK(key1C.IsCompressed() == true);
+    BOOST_CHECK(key2C.IsCompressed() == true);
 
-    CPubKey pubkey1  = key1. GetPubKey();
-    CPubKey pubkey2  = key2. GetPubKey();
+    CPubKey pubkey1  = key1.GetPubKey();
+    CPubKey pubkey2  = key2.GetPubKey();
     CPubKey pubkey1C = key1C.GetPubKey();
     CPubKey pubkey2C = key2C.GetPubKey();
 
@@ -103,20 +76,24 @@ BOOST_AUTO_TEST_CASE(key_test1)
 
         BOOST_CHECK( pubkey1.Verify(hashMsg, sign1));
         BOOST_CHECK(!pubkey1.Verify(hashMsg, sign2));
+		// ToDo: This fails, why?
         BOOST_CHECK( pubkey1.Verify(hashMsg, sign1C));
         BOOST_CHECK(!pubkey1.Verify(hashMsg, sign2C));
 
         BOOST_CHECK(!pubkey2.Verify(hashMsg, sign1));
         BOOST_CHECK( pubkey2.Verify(hashMsg, sign2));
         BOOST_CHECK(!pubkey2.Verify(hashMsg, sign1C));
+		// ToDo: This fails, why?
         BOOST_CHECK( pubkey2.Verify(hashMsg, sign2C));
 
+		// ToDo: This fails, why?
         BOOST_CHECK( pubkey1C.Verify(hashMsg, sign1));
         BOOST_CHECK(!pubkey1C.Verify(hashMsg, sign2));
         BOOST_CHECK( pubkey1C.Verify(hashMsg, sign1C));
         BOOST_CHECK(!pubkey1C.Verify(hashMsg, sign2C));
 
         BOOST_CHECK(!pubkey2C.Verify(hashMsg, sign1));
+		// ToDo: This fails, why?
         BOOST_CHECK( pubkey2C.Verify(hashMsg, sign2));
         BOOST_CHECK(!pubkey2C.Verify(hashMsg, sign1C));
         BOOST_CHECK( pubkey2C.Verify(hashMsg, sign2C));
@@ -143,5 +120,33 @@ BOOST_AUTO_TEST_CASE(key_test1)
         BOOST_CHECK(rkey2C == pubkey2C);
     }
 }
+
+#ifdef KEY_TESTS_DUMPINFO
+// ToDo: This code is so old, it will not compile if enabled.  Needs to be rewritten or removed....
+void dumpKeyInfo(uint256 privkey)
+{
+    CKey key;
+    key.resize(32);
+    memcpy(&secret[0], &privkey, 32);
+    vector<unsigned char> sec;
+    sec.resize(32);
+    memcpy(&sec[0], &secret[0], 32);
+    printf("  * secret (hex): %s\n", HexStr(sec).c_str());
+
+    for (int nCompressed=0; nCompressed<2; nCompressed++)
+    {
+        bool fCompressed = nCompressed == 1;
+        printf("  * %s:\n", fCompressed ? "compressed" : "uncompressed");
+        CIXCoinSecret bsecret;
+        bsecret.SetSecret(secret, fCompressed);
+        printf("    * secret (base58): %s\n", bsecret.ToString().c_str());
+        CKey key;
+        key.SetSecret(secret, fCompressed);
+        vector<unsigned char> vchPubKey = key.GetPubKey();
+        printf("    * pubkey (hex): %s\n", HexStr(vchPubKey).c_str());
+        printf("    * address (base58): %s\n", CIXCoinAddress(vchPubKey).ToString().c_str());
+    }
+}
+#endif
 
 BOOST_AUTO_TEST_SUITE_END()
