@@ -1,3 +1,9 @@
+Note from Ixcoin Core developers...
+
+	Everything in this directory is under review, portions have been changed, however the work is incomplete, and it's content and/or functionality under review.
+
+	Some work has been started to edit the functionality of the sub-components within this catagory, however consider most of them a work in progress.
+
 Wallet Tools
 ---------------------
 

@@ -1,7 +1,8 @@
 '''
+Copyright (c) 2011-2015 The IXCoin Core developers
 IXCoin base58 encoding and decoding.
 
-Based on https://ixcointalk.org/index.php?topic=1026.0 (public domain)
+Based on https://bitcointalk.org/index.php?topic=1026.0 (public domain)
 '''
 import hashlib
 
@@ -95,8 +96,8 @@ def get_bcaddress_version(strAddress):
     return ord(version)
 
 if __name__ == '__main__':
-    # Test case (from http://gitorious.org/ixcoin/python-base58.git)
-    assert get_bcaddress_version('15VjRaDX9zpbA8LVnbrCAFzrVzN7ixHNsC') is 0
+    # Test case (from http://gitorious.org/bitcoin/python-base58.git)
+    assert get_bcaddress_version('xvDc4QyRVTPhuayj2YcE9t1xeiAhV2sE5M') is 0
     _ohai = 'o hai'.encode('ascii')
     _tmp = b58encode(_ohai)
     assert _tmp == 'DYB3oMS'

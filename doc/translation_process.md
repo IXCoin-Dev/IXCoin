@@ -67,8 +67,8 @@ Syncing with Transifex
 ----------------------
 
 We are using https://transifex.com as a frontend for translating the client.
-
-https://www.transifex.com/projects/p/ixcoin/resource/tx/
+Please visit our Project page and click on 'Help Translate' IXCOIN CORE QT:
+https://www.transifex.com/projects/p/ixcoin-core-qt/
 
 The "Transifex client" (see: http://support.transifex.com/customer/portal/topics/440187-transifex-client/articles)
 is used to fetch new translations from Transifex. The configuration for this client (`.tx/config`)
