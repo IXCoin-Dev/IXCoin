@@ -1327,7 +1327,7 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
 		assert(pindexFirst);
 
 		int64 rema = GetAdjustedTime() - pindexFirst->GetBlockTime();
-		
+
 		if(rema < nTargetTimespan)
 */
 			return pindexLast->nBits;
@@ -1354,7 +1354,7 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
 
     if (bnNew > Params().ProofOfWorkLimit())
         bnNew = Params().ProofOfWorkLimit();
- 
+
     return bnNew.GetCompact();
 }
 
@@ -1526,9 +1526,9 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         // so instead of:
         //
         //  foo < bar/1.086     we do   foo < (1000*bar)/1086
-        //  foo = bar/1.086     we do   foo = (1000*bar)/1086 
+        //  foo = bar/1.086     we do   foo = (1000*bar)/1086
         //  foo > bar*1.086     we do   foo > (1086*bar)/1000
-        //  foo = bar*1.086     we do   foo = (1086*bar)/1000 
+        //  foo = bar*1.086     we do   foo = (1086*bar)/1000
         //
         // (parentheses to stress desired operator precedence)
         //
@@ -1560,8 +1560,8 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits)
 {
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
-    //Params().GenesisBlock().print();
-    //printf("Hash: %s, nBits: %08x, Target: %08x, bnLimt: %08x \n", hash.ToString().c_str(), nBits, bnTarget.GetCompact(), Params().ProofOfWorkLimit().GetCompact());
+    // Params().GenesisBlock().print();
+    // printf("Hash: %s, nBits: %08x, Target: %08x, bnLimt: %08x \n", hash.ToString().c_str(), nBits, bnTarget.GetCompact(), Params().ProofOfWorkLimit().GetCompact());
 
     // Check range
     if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
@@ -2016,12 +2016,12 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
    //
     // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2012, 0:00 UTC.
     //
-    // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC 
+    // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC
     // date -d "2012-03-15 0:00 UTC" +"%s"
     int64_t nBIP30SwitchTime = 1388624831;
     bool fEnforceBIP30 = (!pindex->phashBlock) || (pindex->nTime > nBIP30SwitchTime);
-    
-	
+
+
 	// after BIP30 is enabled for some time, we could make the same change
     // as IXCoin, namely the one suggested below
     // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
@@ -2239,7 +2239,7 @@ bool static DisconnectTip(CValidationState &state) {
     BOOST_FOREACH(const CTransaction &tx, block.vtx) {
         // ignore validation errors in resurrected transactions
         list<CTransaction> removed;
-        CValidationState stateDummy; 
+        CValidationState stateDummy;
         if (!tx.IsCoinBase())
             if (!AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
                 mempool.remove(tx, removed, true);
@@ -2887,16 +2887,16 @@ std::string CDiskBlockIndex::ToString() const
         hashPrev.ToString().c_str(),
         (auxpow.get() != NULL) ? auxpow->GetParentBlockHash().ToString().substr(0,20).c_str() : "-");
     return str;
-}  
+}
 CBlockHeader CBlockIndex::GetBlockHeader() const
 {
     CBlockHeader block;
-  
+
     if (nVersion & BLOCK_VERSION_AUXPOW) {
         CDiskBlockIndex diskblockindex;
         // auxpow is not in memory, load CDiskBlockHeader
         // from database to get it
-  
+
         pblocktree->ReadDiskBlockIndex(*phashBlock, diskblockindex);
         block.auxpow = diskblockindex.auxpow;
     }
@@ -3242,7 +3242,7 @@ bool VerifyDB(int nCheckLevel, int nCheckDepth)
                // The specific blocks involved are:
                // (2013-04-26 18:32:41) 132512, 132484, 132466, 132463, 132374, 132371, 132337, 132321, 132265, 132221, 132153, 132134, 132126 (2013-04-25 07:16:35)
                //
-               // The 4 Tx Hash values involved are: 
+               // The 4 Tx Hash values involved are:
                // 4617f8f2b526642b454294e264af0c6b50afde7bf8697db10daacdb9c4d07f07
                // 8d91fc6c481f11df39071a6e375047d062856c4b76ae15af827be180a6224d55
                // 65b842fa42af1d015a91263ea314a631c334d9e6d465a0a945cdadbb79520630
@@ -3262,7 +3262,7 @@ bool VerifyDB(int nCheckLevel, int nCheckDepth)
                     case 132126 :
                          nGoodTransactions += block.vtx.size();
                     break;
-                    
+
                     default :
                          nGoodTransactions = 0;
                          pindexFailure = pindex;
@@ -3519,10 +3519,10 @@ string GetWarnings(string strFor)
         // The piority of this message remains @ 0, yet if nothing else is found, it will be displayed by default for pre-release builds.
 
     // Check for some high priority items to watch out for:
-    
+
     // These nPriority values set an upper limit on what should be used by the development team, when issuing alert messages,
     // as they are more important than anything else to this client's user..
-    
+
     // Misc warnings like out of disk space and clock is wrong
     if (strMiscWarning != "")
     {
@@ -3543,7 +3543,7 @@ string GetWarnings(string strFor)
 
     // Alerts
     // Any network wide alerts that have shown up, and have a greater priority
-    // than what is listed above, will now be checked and the highest 
+    // than what is listed above, will now be checked and the highest
     // priorty one is picked & shown to the user.
     // NOTE: If two alerts have the same priority, it will be the 1st one
     //       found, that gets shown to the user.
@@ -4721,8 +4721,8 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         // in flight for over two minutes, since we first had a chance to
         // process an incoming block.
         int64_t nNow = GetTimeMicros();
-        if (!pto->fDisconnect && state.nBlocksInFlight && 
-            state.nLastBlockReceive < state.nLastBlockProcess - BLOCK_DOWNLOAD_TIMEOUT*1000000 && 
+        if (!pto->fDisconnect && state.nBlocksInFlight &&
+            state.nLastBlockReceive < state.nLastBlockProcess - BLOCK_DOWNLOAD_TIMEOUT*1000000 &&
             state.vBlocksInFlight.front().nTime < state.nLastBlockProcess - 2*BLOCK_DOWNLOAD_TIMEOUT*1000000) {
             LogPrintf("Peer %s is stalling block download, disconnecting\n", state.name.c_str());
             pto->fDisconnect = true;
