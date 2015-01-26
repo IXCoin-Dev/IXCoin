@@ -2014,17 +2014,28 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     // two in the chain that violate it. This prevents exploiting the issue against nodes in their
     // initial block download.
    //
-    // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2012, 0:00 UTC.
+    // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2016, 0:00 UTC.
     //
-    // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC
-    // date -d "2012-03-15 0:00 UTC" +"%s"
-    int64_t nBIP30SwitchTime = 1388624831;
+    // BIP30 for IXCOIN will go into effect on March 15, 2016 0:00 UTC
+    // date -d "2016-03-16 0:00 UTC" +"%s"
+    //
+    // GR Updated on: 1/26/2015
+    // Generated from: http://www.epochconverter.com/
+    // Epoch timestamp: 1458000000
+    // Timestamp in milliseconds: 1458000000000
+    // Human time (GMT): Tue, 15 Mar 2016 00:00:00 GMT
+    // Human time (your time zone): Mon 14 Mar 2016 06:00:00 PM MDT
+    int64_t nBIP30SwitchTime = 1458000000;
     bool fEnforceBIP30 = (!pindex->phashBlock) || (pindex->nTime > nBIP30SwitchTime);
 
 
-	// after BIP30 is enabled for some time, we could make the same change
-    // as IXCoin, namely the one suggested below
-    // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
+    // Big ToDo:
+    // The remainder of this code needs now to be fixed, tested and reviewed at a later time,
+    // on 1/26/2015 we can not debug and test mining operation, without it interfering.
+	//
+	// after BIP30 is enabled for some time, we could make the same change??
+    // namely the one suggested below??
+    // This rule was originally applied all blocks whose timestamp was after ?, 0:00 UTC.
     // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
     // two in the chain that violate it. This prevents exploiting the issue against nodes in their
     // initial block download.
@@ -2671,33 +2682,6 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CDiskBlockPos* dbp)
         CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(mapBlockIndex);
         if (pcheckpoint && nHeight < pcheckpoint->nHeight)
             return state.DoS(100, error("AcceptBlock() : forked chain older than last checkpoint (height %d)", nHeight));
-	// DEVCOIN currently doesn't enforce 2 blocks, since merged mining
-	// produces v1 blocks and normal mining should produce v2 blocks.
-
-        // Reject block.nVersion=1 blocks when 95% (75% on testnet) of the network has upgraded:
-        /*if (block.nVersion < 2)
-        {
-            if ((!TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 950, 1000)) ||
-                (TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 75, 100)))
-            {
-                return state.Invalid(error("AcceptBlock() : rejected nVersion=1 block"),
-                                     REJECT_OBSOLETE, "bad-version");
-            }
-        }*/
-        // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
-        //if (block.nVersion >= 2)
-        //{
-        //    // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
-        //    if ((!TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 750, 1000)) ||
-        //        (TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 51, 100)))
-        //    {
-        //        CScript expect = CScript() << nHeight;
-        //        if (block.vtx[0].vin[0].scriptSig.size() < expect.size() ||
-        //            !std::equal(expect.begin(), expect.end(), block.vtx[0].vin[0].scriptSig.begin()))
-        //            return state.DoS(100, error("AcceptBlock() : block height mismatch in coinbase"),
-        //                             REJECT_INVALID, "bad-cb-height");
-        //    }
-        //}
     }
 
     // Write block to history file
