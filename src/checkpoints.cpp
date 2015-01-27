@@ -38,14 +38,13 @@ namespace Checkpoints
     //   (no blocks before with a timestamp after, none after with
     //    timestamp before)
     // + Contains no strange transactions
-    static MapCheckpoints mapCheckpoints =
-        boost::assign::map_list_of
+    static MapCheckpoints mapCheckpoints = boost::assign::map_list_of
 	(  4500,  uint256("0x00000000de37be98ca45cf0613fa2a321eba28e237543f9fee9b6a7605d03a94"))
 	( 198007, uint256("0x00fdfc9130416482887e4d56f89f4568c2f4d7764d14cc66833503f31a6ac73d"))
 	;
 
-    /* Devcoin had not testnet checkblocks, if they even start to exist, they can be added here */
-    static MapCheckpoints mapCheckpointsTestnet  = boost::assign::map_list_of 
+    // Ixcoin has no testnet checkblocks, if they even start to exist, they can be added here
+    static MapCheckpoints mapCheckpointsTestnet = boost::assign::map_list_of
 	( 0, uint256("0x0000000e266692d6c16814490ca60acda9398727680325386bbdd98c61457a48"))
 	;
     static const CCheckpointData data = {

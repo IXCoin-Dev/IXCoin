@@ -2009,39 +2009,26 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     // See BIP30 and http://r6.ca/blog/20120206T005236Z.html for more information.
     // This logic is not necessary for memory pool transactions, as AcceptToMemoryPool
     // already refuses previously-known transaction ids entirely.
-    // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
+    // For Bitcoin, this rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
     // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
-    // two in the chain that violate it. This prevents exploiting the issue against nodes in their
-    // initial block download.
-   //
-    // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2016, 0:00 UTC.
+    // two in the chain that violate it.
     //
-    // BIP30 for IXCOIN will go into effect on March 15, 2016 0:00 UTC
-    // date -d "2016-03-16 0:00 UTC" +"%s"
+    // GR Note: Ixcoin has no such two blocks, that I am aware of.  The epoch 1388624831 has been
+    // arbitrarily picked while developing v8, so in order to remain compatiable with those v8 nodes
+    // now running on the network, our v9 core will continoue to have the same & remain compatiable.
     //
-    // GR Updated on: 1/26/2015
+    // This prevents exploiting the issue against nodes in their initial block download.
+    //
+    // This rule applies to all IXCoin blocks whose timestamp is after 1388624831.
+    //
+    // BIP30 for IXCOIN has gone into effect on 02 Jan 2014 01:07:11 GMT
+    // Code Updated on: 1/27/2015 by GroundRod
     // Generated from: http://www.epochconverter.com/
-    // Epoch timestamp: 1458000000
-    // Timestamp in milliseconds: 1458000000000
-    // Human time (GMT): Tue, 15 Mar 2016 00:00:00 GMT
-    // Human time (your time zone): Mon 14 Mar 2016 06:00:00 PM MDT
-    int64_t nBIP30SwitchTime = 1458000000;
+    // Epoch timestamp: 1388624831
+    // Human time: Thu, 02 Jan 2014 01:07:11 GMT
+    int64_t nBIP30SwitchTime = 1388624831;
     bool fEnforceBIP30 = (!pindex->phashBlock) || (pindex->nTime > nBIP30SwitchTime);
 
-
-    // Big ToDo:
-    // The remainder of this code needs now to be fixed, tested and reviewed at a later time,
-    // on 1/26/2015 we can not debug and test mining operation, without it interfering.
-	//
-	// after BIP30 is enabled for some time, we could make the same change??
-    // namely the one suggested below??
-    // This rule was originally applied all blocks whose timestamp was after ?, 0:00 UTC.
-    // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
-    // two in the chain that violate it. This prevents exploiting the issue against nodes in their
-    // initial block download.
-	//bool fEnforceBIP30 = (!pindex->phashBlock) || // Enforce on CreateNewBlock invocations which don't have a hash.
- //                         !((pindex->nHeight==91842 && pindex->GetBlockHash() == uint256("0x00000000000a4d0a398161ffc163c503763b1f4360639393e0e4c8e300e0caec")) ||
- //                          (pindex->nHeight==91880 && pindex->GetBlockHash() == uint256("0x00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721")));*/
     if (fEnforceBIP30) {
         for (unsigned int i = 0; i < block.vtx.size(); i++) {
             uint256 hash = block.GetTxHash(i);
@@ -2051,7 +2038,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
         }
     }
 
-    // BIP16 didn't become active until Apr 1 2012
+    // As well, BIP16 didn't become active for Ixcoin, until 02 Jan 2014 01:07:11 GMT
     int64_t nBIP16SwitchTime = 1388624831;
     bool fStrictPayToScriptHash = (pindex->nTime >= nBIP16SwitchTime);
 

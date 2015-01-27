@@ -867,9 +867,7 @@ Value getauxblock(const Array& params, bool fHelp)
 			// Need to update only after we know CreateNewBlock succeeded
             pindexPrev = pindexPrevNew;
             // Push OP_2 just in case we want versioning later
-            // FIXME: Debugging 9.3 upgrade build problem, commenting out this line fixed it (GR)
-            // the problem is related to use of CBigNum, they are no longer referenced in script objects
-            //pblock->vtx[0].vin[0].scriptSig = CScript() << pblock->nBits << CBigNum(1) << OP_2;
+            pblock->vtx[0].vin[0].scriptSig = CScript() << pblock->nBits << CScriptNum(1) << OP_2;
 
             pblock->hashMerkleRoot = pblock->BuildMerkleTree();
 			CAuxPow *blockAuxPow = new CAuxPow();
