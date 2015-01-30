@@ -2014,8 +2014,8 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     // two in the chain that violate it.
     //
     // GR Note: Ixcoin has no such two blocks, that I am aware of.  The epoch 1388624831 has been
-    // arbitrarily picked while developing v8, so in order to remain compatiable with those v8 nodes
-    // now running on the network, our v9 core will continoue to have the same & remain compatiable.
+    // arbitrarily picked while developing v8, so in order to remain compatible with those v8 nodes
+    // now running on the network, our v9 core will continue to have the same & remain compatible.
     //
     // This prevents exploiting the issue against nodes in their initial block download.
     //

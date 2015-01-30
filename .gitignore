@@ -1,3 +1,16 @@
+# For collections of useful .gitignore templates visit: https://github.com/github/gitignore
+#
+# Primarily those entries that follow are very specific to building Ixcoin and it's toolchain,
+# the running of tests and/or building bootstrap data files.
+# A few are for future structural changes to v10 core technology, that could otherwise be
+# left out at this time.
+#
+# The challenge has been to get this list correct for building on the different platforms,
+# linux, mingw32 on windows and darwin for the mac are the primary initial concerns.
+# If your building with VisualStudio, running an IDE like Eclipse please add them above,
+# or below this group.  If your building Ixcoin for an Andriod (or other) target, we would
+# like to see those needed exceptions added near the bottom of this list, as a group.
+
 *.tar.gz
 
 *.exe
@@ -73,7 +86,6 @@ src/qt/test/moc*.cpp
 
 # Compilation and Qt preprocessor part
 *.qm
-Makefile
 ixcoin-qt
 Ixcoin-Qt.app
 
@@ -108,7 +120,14 @@ qa/pull-tester/tests-config.sh
 qa/pull-tester/cache/*
 qa/pull-tester/test.*/*
 
-!src/leveldb*/Makefile
+# Some Makefiles are built locally, others are static now, and we must
+# include them, such as the one in depends, qt, qt test and leveldb.
+Makefile
+!depends/Makefile
+!src/qt/Makefile
+!src/test/Makefile
+!src/leveldb/Makefile
+
 src/leveldb/build_config.mk
 
 /doc/doxygen/
