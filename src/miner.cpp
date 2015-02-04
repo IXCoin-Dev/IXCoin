@@ -145,7 +145,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     int64_t nFees = 0;
     {
         LOCK2(cs_main, mempool.cs);
-        
+
         CCoinsViewCache view(*pcoinsTip, true);
 
         // Priority order to process transactions
@@ -477,8 +477,8 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
             return error("AUX POW parent hash %s is not under target %s", auxpow->GetParentBlockHash().GetHex().c_str(), hashTarget.GetHex().c_str());
 
         //// debug print
-        printf("DevcoinMiner:\n");
-        printf("AUX proof-of-work found  \n     our hash: %s   \n  parent hash: %s  \n       target: %s\n",
+        LogPrintf("IxcoinMiner:\n");
+        LogPrintf("AUX proof-of-work found  \n     our hash: %s   \n  parent hash: %s  \n       target: %s\n",
                 hash.GetHex().c_str(),
                 auxpow->GetParentBlockHash().GetHex().c_str(),
                 hashTarget.GetHex().c_str());
@@ -489,7 +489,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 			return false;
 
 		//// debug print
-		LogPrintf("DevcoinMiner:\n");
+		LogPrintf("IxcoinMiner:\n");
 		LogPrintf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex(), hashTarget.GetHex());
 	}
     pblock->print();

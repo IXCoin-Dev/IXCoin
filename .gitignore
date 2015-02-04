@@ -1,24 +1,54 @@
+# For collections of useful .gitignore templates visit: https://github.com/github/gitignore
+#
+# Primarily those entries that follow are very specific to building Ixcoin and it's toolchain,
+# the running of tests and/or building bootstrap data files.
+# A few are for future structural changes to v10 core technology, that could otherwise be
+# left out at this time.
+#
+# The challenge has been to get this list correct for building on the different platforms,
+# linux, mingw32 on windows and darwin for the mac are the primary initial concerns.
+# If your building with VisualStudio, running an IDE like Eclipse please add them above,
+# or below this group.  If your building Ixcoin for an Andriod (or other) target, we would
+# like to see those needed exceptions added near the bottom of this list, as a group.
+
 *.tar.gz
 
 *.exe
 src/ixcoin
 src/ixcoind
 src/ixcoin-cli
+src/ixcoin-tx
 src/test/test_ixcoin
 src/qt/test/test_ixcoin-qt
 
+# autoreconf
 Makefile.in
 aclocal.m4
 autom4te.cache/
+build-aux/config.guess
+build-aux/config.sub
+build-aux/depcomp
+build-aux/install-sh
+build-aux/ltmain.sh
+build-aux/m4/libtool.m4
+build-aux/m4/lt~obsolete.m4
+build-aux/m4/ltoptions.m4
+build-aux/m4/ltsugar.m4
+build-aux/m4/ltversion.m4
+build-aux/missing
+build-aux/compile
+build-aux/test-driver
 config.log
 config.status
 configure
-src/ixcoin-config.h
-src/ixcoin-config.h.in
-src/build-aux/
-src/stamp-h1
+libtool
+src/config/ixcoin-config.h
+src/config/ixcoin-config.h.in
+src/config/stamp-h1
 share/setup.nsi
 share/qt/Info.plist
+
+src/univalue/gen
 
 src/qt/*.moc
 src/qt/moc_*.cpp
@@ -28,11 +58,13 @@ src/qt/test/moc*.cpp
 
 .deps
 .dirstamp
+.libs
 .*.swp
 *.*~*
 *.bak
 *.rej
 *.orig
+*.pyc
 *.o
 *.o-*
 *.patch
@@ -48,15 +80,19 @@ src/qt/test/moc*.cpp
 *.json.h
 *.raw.h
 
+#libtool object files
+*.lo
+*.la
+
 # Compilation and Qt preprocessor part
 *.qm
-Makefile
 ixcoin-qt
-IXCoin-Qt.app
+Ixcoin-Qt.app
 
 # Unit-tests
 Makefile.test
 ixcoin-qt_test
+src/test/buildenv.py
 
 # Resources cpp
 qrc_*.cpp
@@ -80,6 +116,20 @@ linux-coverage-build
 linux-build
 win32-build
 qa/pull-tester/run-ixcoind-for-test.sh
-qa/pull-tester/build-tests.sh
+qa/pull-tester/tests-config.sh
+qa/pull-tester/cache/*
+qa/pull-tester/test.*/*
 
-!src/leveldb*/Makefile
+# Some Makefiles are built locally, others are static now, and we must
+# include them, such as the one in depends, qt, qt test and leveldb.
+Makefile
+!depends/Makefile
+!src/qt/Makefile
+!src/test/Makefile
+!src/leveldb/Makefile
+
+src/leveldb/build_config.mk
+
+/doc/doxygen/
+
+libixcoinconsensus.pc

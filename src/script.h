@@ -22,7 +22,9 @@ class CKeyStore;
 class CTransaction;
 
 static const unsigned int MAX_SCRIPT_ELEMENT_SIZE = 520; // bytes
-static const unsigned int MAX_OP_RETURN_RELAY = 80;      // bytes
+
+// Changing back to 40 and re-run tests
+static const unsigned int MAX_OP_RETURN_RELAY = 40;      // bytes
 
 class scriptnum_error : public std::runtime_error
 {

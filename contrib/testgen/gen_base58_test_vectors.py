@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 '''
+Copyright (c) 2011-2015 The Ixcoin Core developers
 Generate valid and invalid base58 address and private key test vectors.
 
 Usage: 
@@ -15,11 +16,11 @@ import random
 from binascii import b2a_hex
 
 # key types
-PUBKEY_ADDRESS = 0
+PUBKEY_ADDRESS = 138
 SCRIPT_ADDRESS = 5
+PRIVKEY = 128
 PUBKEY_ADDRESS_TEST = 111
 SCRIPT_ADDRESS_TEST = 196
-PRIVKEY = 128
 PRIVKEY_TEST = 239
 
 metadata_keys = ['isPrivkey', 'isTestnet', 'addrType', 'isCompressed']

@@ -1,10 +1,12 @@
 // Copyright (c) 2012-2013 The Bitcoin developers
+// Copyright (c) 2011-2014 The Ixcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef IXCOIN_LEVELDBWRAPPER_H
 #define IXCOIN_LEVELDBWRAPPER_H
 
+#include "clientversion.h"
 #include "serialize.h"
 #include "util.h"
 #include "version.h"

@@ -1,9 +1,10 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
+// Copyright (c) 2011-2014 The Ixcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #if defined(HAVE_CONFIG_H)
-#include "ixcoin-config.h"
+#include "config/ixcoin-config.h"
 #endif
 
 #include "ixcoingui.h"
@@ -52,7 +53,13 @@ Q_IMPORT_PLUGIN(qkrcodecs)
 Q_IMPORT_PLUGIN(qtaccessiblewidgets)
 #else
 Q_IMPORT_PLUGIN(AccessibleFactory)
+#if defined(QT_QPA_PLATFORM_XCB)
+Q_IMPORT_PLUGIN(QXcbIntegrationPlugin);
+#elif defined(QT_QPA_PLATFORM_WINDOWS)
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+#elif defined(QT_QPA_PLATFORM_COCOA)
+Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
+#endif
 #endif
 #endif
 

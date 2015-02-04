@@ -1,5 +1,10 @@
-#ifndef URITESTS_H
-#define URITESTS_H
+// Copyright (c) 2011-2014 The Ixcoin Core developers
+// Copyright (c) 2009-2014 The Bitcoin developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+#ifndef IXCOIN_QT_TEST_URITESTS_H
+#define IXCOIN_QT_TEST_URITESTS_H
 
 #include <QObject>
 #include <QTest>
@@ -12,4 +17,4 @@ private slots:
     void uriTests();
 };
 
-#endif // URITESTS_H
+#endif // IXCOIN_QT_TEST_URITESTS_H

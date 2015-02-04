@@ -1,14 +1,16 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2013 The Bitcoin developers
+// Copyright (c) 2011-2014 The Ixcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "util.h"
+#include "chainparams.h"
+#include "clientversion.h"
 #include "init.h"
 #include "rpcclient.h"
 #include "rpcprotocol.h"
 #include "ui_interface.h" /* for _(...) */
-#include "chainparams.h"
+#include "util.h"
 
 #include <boost/filesystem/operations.hpp>
 

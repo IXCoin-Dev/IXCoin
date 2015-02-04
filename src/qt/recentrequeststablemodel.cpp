@@ -1,9 +1,11 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
+// Copyright (c) 2011-2014 The Ixcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "recentrequeststablemodel.h"
 
+#include "clientversion.h"
 #include "ixcoinunits.h"
 #include "guiutil.h"
 #include "optionsmodel.h"

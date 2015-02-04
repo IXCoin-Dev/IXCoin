@@ -1327,7 +1327,7 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
 		assert(pindexFirst);
 
 		int64 rema = GetAdjustedTime() - pindexFirst->GetBlockTime();
-		
+
 		if(rema < nTargetTimespan)
 */
 			return pindexLast->nBits;
@@ -1354,7 +1354,7 @@ unsigned int GetNextWorkRequired_OLD(const CBlockIndex* pindexLast, const CBlock
 
     if (bnNew > Params().ProofOfWorkLimit())
         bnNew = Params().ProofOfWorkLimit();
- 
+
     return bnNew.GetCompact();
 }
 
@@ -1526,9 +1526,9 @@ unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHead
         // so instead of:
         //
         //  foo < bar/1.086     we do   foo < (1000*bar)/1086
-        //  foo = bar/1.086     we do   foo = (1000*bar)/1086 
+        //  foo = bar/1.086     we do   foo = (1000*bar)/1086
         //  foo > bar*1.086     we do   foo > (1086*bar)/1000
-        //  foo = bar*1.086     we do   foo = (1086*bar)/1000 
+        //  foo = bar*1.086     we do   foo = (1086*bar)/1000
         //
         // (parentheses to stress desired operator precedence)
         //
@@ -1560,8 +1560,8 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits)
 {
     CBigNum bnTarget;
     bnTarget.SetCompact(nBits);
-    //Params().GenesisBlock().print();
-    //printf("Hash: %s, nBits: %08x, Target: %08x, bnLimt: %08x \n", hash.ToString().c_str(), nBits, bnTarget.GetCompact(), Params().ProofOfWorkLimit().GetCompact());
+    // Params().GenesisBlock().print();
+    // printf("Hash: %s, nBits: %08x, Target: %08x, bnLimt: %08x \n", hash.ToString().c_str(), nBits, bnTarget.GetCompact(), Params().ProofOfWorkLimit().GetCompact());
 
     // Check range
     if (bnTarget <= 0 || bnTarget > Params().ProofOfWorkLimit())
@@ -2009,28 +2009,26 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
     // See BIP30 and http://r6.ca/blog/20120206T005236Z.html for more information.
     // This logic is not necessary for memory pool transactions, as AcceptToMemoryPool
     // already refuses previously-known transaction ids entirely.
-    // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
+    // For Bitcoin, this rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
     // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
-    // two in the chain that violate it. This prevents exploiting the issue against nodes in their
-    // initial block download.
-   //
-    // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2012, 0:00 UTC.
+    // two in the chain that violate it.
     //
-    // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC 
-    // date -d "2012-03-15 0:00 UTC" +"%s"
+    // GR Note: Ixcoin has no such two blocks, that I am aware of.  The epoch 1388624831 has been
+    // arbitrarily picked while developing v8, so in order to remain compatible with those v8 nodes
+    // now running on the network, our v9 core will continue to have the same & remain compatible.
+    //
+    // This prevents exploiting the issue against nodes in their initial block download.
+    //
+    // This rule applies to all IXCoin blocks whose timestamp is after 1388624831.
+    //
+    // BIP30 for IXCOIN has gone into effect on 02 Jan 2014 01:07:11 GMT
+    // Code Updated on: 1/27/2015 by GroundRod
+    // Generated from: http://www.epochconverter.com/
+    // Epoch timestamp: 1388624831
+    // Human time: Thu, 02 Jan 2014 01:07:11 GMT
     int64_t nBIP30SwitchTime = 1388624831;
     bool fEnforceBIP30 = (!pindex->phashBlock) || (pindex->nTime > nBIP30SwitchTime);
-    
-	
-	// after BIP30 is enabled for some time, we could make the same change
-    // as IXCoin, namely the one suggested below
-    // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
-    // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
-    // two in the chain that violate it. This prevents exploiting the issue against nodes in their
-    // initial block download.
-	//bool fEnforceBIP30 = (!pindex->phashBlock) || // Enforce on CreateNewBlock invocations which don't have a hash.
- //                         !((pindex->nHeight==91842 && pindex->GetBlockHash() == uint256("0x00000000000a4d0a398161ffc163c503763b1f4360639393e0e4c8e300e0caec")) ||
- //                          (pindex->nHeight==91880 && pindex->GetBlockHash() == uint256("0x00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721")));*/
+
     if (fEnforceBIP30) {
         for (unsigned int i = 0; i < block.vtx.size(); i++) {
             uint256 hash = block.GetTxHash(i);
@@ -2040,7 +2038,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
         }
     }
 
-    // BIP16 didn't become active until Apr 1 2012
+    // As well, BIP16 didn't become active for Ixcoin, until 02 Jan 2014 01:07:11 GMT
     int64_t nBIP16SwitchTime = 1388624831;
     bool fStrictPayToScriptHash = (pindex->nTime >= nBIP16SwitchTime);
 
@@ -2239,7 +2237,7 @@ bool static DisconnectTip(CValidationState &state) {
     BOOST_FOREACH(const CTransaction &tx, block.vtx) {
         // ignore validation errors in resurrected transactions
         list<CTransaction> removed;
-        CValidationState stateDummy; 
+        CValidationState stateDummy;
         if (!tx.IsCoinBase())
             if (!AcceptToMemoryPool(mempool, stateDummy, tx, false, NULL))
                 mempool.remove(tx, removed, true);
@@ -2671,33 +2669,6 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CDiskBlockPos* dbp)
         CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(mapBlockIndex);
         if (pcheckpoint && nHeight < pcheckpoint->nHeight)
             return state.DoS(100, error("AcceptBlock() : forked chain older than last checkpoint (height %d)", nHeight));
-	// DEVCOIN currently doesn't enforce 2 blocks, since merged mining
-	// produces v1 blocks and normal mining should produce v2 blocks.
-
-        // Reject block.nVersion=1 blocks when 95% (75% on testnet) of the network has upgraded:
-        /*if (block.nVersion < 2)
-        {
-            if ((!TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 950, 1000)) ||
-                (TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 75, 100)))
-            {
-                return state.Invalid(error("AcceptBlock() : rejected nVersion=1 block"),
-                                     REJECT_OBSOLETE, "bad-version");
-            }
-        }*/
-        // Enforce block.nVersion=2 rule that the coinbase starts with serialized block height
-        //if (block.nVersion >= 2)
-        //{
-        //    // if 750 of the last 1,000 blocks are version 2 or greater (51/100 if testnet):
-        //    if ((!TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 750, 1000)) ||
-        //        (TestNet() && CBlockIndex::IsSuperMajority(2, pindexPrev, 51, 100)))
-        //    {
-        //        CScript expect = CScript() << nHeight;
-        //        if (block.vtx[0].vin[0].scriptSig.size() < expect.size() ||
-        //            !std::equal(expect.begin(), expect.end(), block.vtx[0].vin[0].scriptSig.begin()))
-        //            return state.DoS(100, error("AcceptBlock() : block height mismatch in coinbase"),
-        //                             REJECT_INVALID, "bad-cb-height");
-        //    }
-        //}
     }
 
     // Write block to history file
@@ -2887,16 +2858,16 @@ std::string CDiskBlockIndex::ToString() const
         hashPrev.ToString().c_str(),
         (auxpow.get() != NULL) ? auxpow->GetParentBlockHash().ToString().substr(0,20).c_str() : "-");
     return str;
-}  
+}
 CBlockHeader CBlockIndex::GetBlockHeader() const
 {
     CBlockHeader block;
-  
+
     if (nVersion & BLOCK_VERSION_AUXPOW) {
         CDiskBlockIndex diskblockindex;
         // auxpow is not in memory, load CDiskBlockHeader
         // from database to get it
-  
+
         pblocktree->ReadDiskBlockIndex(*phashBlock, diskblockindex);
         block.auxpow = diskblockindex.auxpow;
     }
@@ -3242,7 +3213,7 @@ bool VerifyDB(int nCheckLevel, int nCheckDepth)
                // The specific blocks involved are:
                // (2013-04-26 18:32:41) 132512, 132484, 132466, 132463, 132374, 132371, 132337, 132321, 132265, 132221, 132153, 132134, 132126 (2013-04-25 07:16:35)
                //
-               // The 4 Tx Hash values involved are: 
+               // The 4 Tx Hash values involved are:
                // 4617f8f2b526642b454294e264af0c6b50afde7bf8697db10daacdb9c4d07f07
                // 8d91fc6c481f11df39071a6e375047d062856c4b76ae15af827be180a6224d55
                // 65b842fa42af1d015a91263ea314a631c334d9e6d465a0a945cdadbb79520630
@@ -3262,7 +3233,7 @@ bool VerifyDB(int nCheckLevel, int nCheckDepth)
                     case 132126 :
                          nGoodTransactions += block.vtx.size();
                     break;
-                    
+
                     default :
                          nGoodTransactions = 0;
                          pindexFailure = pindex;
@@ -3519,10 +3490,10 @@ string GetWarnings(string strFor)
         // The piority of this message remains @ 0, yet if nothing else is found, it will be displayed by default for pre-release builds.
 
     // Check for some high priority items to watch out for:
-    
+
     // These nPriority values set an upper limit on what should be used by the development team, when issuing alert messages,
     // as they are more important than anything else to this client's user..
-    
+
     // Misc warnings like out of disk space and clock is wrong
     if (strMiscWarning != "")
     {
@@ -3543,7 +3514,7 @@ string GetWarnings(string strFor)
 
     // Alerts
     // Any network wide alerts that have shown up, and have a greater priority
-    // than what is listed above, will now be checked and the highest 
+    // than what is listed above, will now be checked and the highest
     // priorty one is picked & shown to the user.
     // NOTE: If two alerts have the same priority, it will be the 1st one
     //       found, that gets shown to the user.
@@ -4721,8 +4692,8 @@ bool SendMessages(CNode* pto, bool fSendTrickle)
         // in flight for over two minutes, since we first had a chance to
         // process an incoming block.
         int64_t nNow = GetTimeMicros();
-        if (!pto->fDisconnect && state.nBlocksInFlight && 
-            state.nLastBlockReceive < state.nLastBlockProcess - BLOCK_DOWNLOAD_TIMEOUT*1000000 && 
+        if (!pto->fDisconnect && state.nBlocksInFlight &&
+            state.nLastBlockReceive < state.nLastBlockProcess - BLOCK_DOWNLOAD_TIMEOUT*1000000 &&
             state.vBlocksInFlight.front().nTime < state.nLastBlockProcess - 2*BLOCK_DOWNLOAD_TIMEOUT*1000000) {
             LogPrintf("Peer %s is stalling block download, disconnecting\n", state.name.c_str());
             pto->fDisconnect = true;

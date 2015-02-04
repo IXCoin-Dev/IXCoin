@@ -1,4 +1,5 @@
 // Copyright (c) 2011-2013 The Bitcoin developers
+// Copyright (c) 2011-2014 The Ixcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -22,7 +23,7 @@
 #endif
 
 #if defined(HAVE_CONFIG_H)
-#include "ixcoin-config.h" /* for USE_QRCODE */
+#include "config/ixcoin-config.h" /* for USE_QRCODE */
 #endif
 
 #ifdef USE_QRCODE
