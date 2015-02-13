@@ -1,15 +1,23 @@
-# For collections of useful .gitignore templates visit: https://github.com/github/gitignore
+# The Ixcoin core primary gitignore file...
 #
-# Primarily those entries that follow are very specific to building Ixcoin and it's toolchain,
-# the running of tests and/or building bootstrap data files.
+# The entries that follow are specific to building Ixcoin and it's toolchain, as well
+# as running tests and various other core code activities.
 # A few are for future structural changes to v10 core technology, that could otherwise be
 # left out at this time.
 #
 # The challenge has been to get this list correct for building on the different platforms,
-# linux, mingw32 on windows and darwin for the mac are the primary initial concerns.
-# If your building with VisualStudio, running an IDE like Eclipse please add them above,
-# or below this group.  If your building Ixcoin for an Andriod (or other) target, we would
-# like to see those needed exceptions added near the bottom of this list, as a group.
+# initially this refers to linux, mingw32 on windows, and darwin on the mac.
+#
+# If your building with VisualStudio, running an IDE like Eclipse or Code::Blocks please
+# add your entries, above or below this group.  As well, other types of non-standard tools.
+#
+# Core developers working on a subcomponent are welcome to include entries here, or use
+# your subfolder and create an ignore list, specifically for your project.
+#
+# As this file is a work in progress, newly discovered items missing from the list are
+# encouraged to be added, if your in a hurry, throw it at the bottom, for later organizing.
+#
+# For collections of useful .gitignore templates visit: https://github.com/github/gitignore
 
 *.tar.gz
 
@@ -67,12 +75,10 @@ src/qt/test/moc*.cpp
 *.pyc
 *.o
 *.o-*
-*.patch
 .ixcoin
 *.a
 *.pb.cc
 *.pb.h
-
 *.log
 *.trs
 *.dmg
@@ -129,7 +135,11 @@ Makefile
 !src/leveldb/Makefile
 
 src/leveldb/build_config.mk
-
 /doc/doxygen/
+libanoncoinconsensus.pc
+src/qt/paymentrequest.pb.cc
+src/qt/paymentrequest.pb.h
 
-libixcoinconsensus.pc
+# Add any other specific requirements, you may need, below this line...
+#
+
