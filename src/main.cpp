@@ -1262,7 +1262,7 @@ int64_t GetBlockValue(int nHeight, int64_t nFees)
     // Subsidy is cut in half every 218750 blocks, which will occur approximately every 4 years
     nSubsidy >>= (nHeight / 210000);
 
-    //Hard limit to 21M Ixcoins
+    //Hard limit to 21M IXCoins
     if (nHeight >= 227499)
     		nSubsidy = 0;
 
@@ -1362,8 +1362,8 @@ unsigned int static GetNextWorkRequired_IXC(const CBlockIndex* pindexLast)
 {
     unsigned int nProofOfWorkLimit = Params().ProofOfWorkLimit().GetCompact();
     int64 nTargetTimespan = 14 * 24 * 60 * 60; // two weeks
-    bool revisedIxcoin = pindexLast->nHeight+1 > 20055; //next normal target: 20160
-    if (revisedIxcoin) nTargetTimespan = 24 * 60 * 60; //24 hours i.e. 144 blocks
+    bool revisedIXCoin = pindexLast->nHeight+1 > 20055; //next normal target: 20160
+    if (revisedIXCoin) nTargetTimespan = 24 * 60 * 60; //24 hours i.e. 144 blocks
 
     const int64 nTargetSpacing = 10 * 60;
     const int64 nInterval = nTargetTimespan / nTargetSpacing;
@@ -1394,7 +1394,7 @@ unsigned int static GetNextWorkRequired_IXC(const CBlockIndex* pindexLast)
     // Limit adjustment step
     int64 nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
     //printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
-    if (!revisedIxcoin) {
+    if (!revisedIXCoin) {
 		if (nActualTimespan < nTargetTimespan/4)
 	        nActualTimespan = nTargetTimespan/4;
 	    if (nActualTimespan > nTargetTimespan*4)
@@ -2016,7 +2016,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
    //
     // This rule applies to all IXCoin blocks whose timestamp is after March 15, 2012, 0:00 UTC.
     //
-    // BIP30 for DEVCOIN will go into effect on March 15, 2012 0:00 UTC 
+    // BIP30 for IXCoin will go into effect on March 15, 2012 0:00 UTC 
     // date -d "2012-03-15 0:00 UTC" +"%s"
     int64_t nBIP30SwitchTime = 1388624831;
     bool fEnforceBIP30 = (!pindex->phashBlock) || (pindex->nTime > nBIP30SwitchTime);
@@ -2671,7 +2671,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CDiskBlockPos* dbp)
         CBlockIndex* pcheckpoint = Checkpoints::GetLastCheckpoint(mapBlockIndex);
         if (pcheckpoint && nHeight < pcheckpoint->nHeight)
             return state.DoS(100, error("AcceptBlock() : forked chain older than last checkpoint (height %d)", nHeight));
-	// DEVCOIN currently doesn't enforce 2 blocks, since merged mining
+	// IXCoin currently doesn't enforce 2 blocks, since merged mining
 	// produces v1 blocks and normal mining should produce v2 blocks.
 
         // Reject block.nVersion=1 blocks when 95% (75% on testnet) of the network has upgraded:
@@ -3234,7 +3234,7 @@ bool VerifyDB(int nCheckLevel, int nCheckDepth)
                 return error("VerifyDB() : *** irrecoverable inconsistency in block data at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             pindexState = pindex->pprev;
             if (!fClean) {
-               // Ixcoin has 8 blocks from back in the 4.2013 timeframe, that will not verify @ checklevel 3, so here we code in the verifychain() fix
+               // IXCoin has 8 blocks from back in the 4.2013 timeframe, that will not verify @ checklevel 3, so here we code in the verifychain() fix
                //
                // The problem spans 13 blocks and was caused by the miner using duplicate coinbase Tx hash values.
                // All problem transactions were mined to this address: xqtX774tAbX9Dz7uKkwZivAnSiPnVjsRci
@@ -3509,7 +3509,7 @@ string GetWarnings(string strFor)
     if (GetBoolArg("-testsafemode", false))
         strRPC = "test";
 
-    // Ixcoin uses this feature for initial 'Pre-Release' builds, when your production code is finished,
+    // IXCoin uses this feature for initial 'Pre-Release' builds, when your production code is finished,
     // be sure to change this value to 'true', by setting it in the configure.ac file.  Then reconfigure & build all
     // from the source code.  The sendalert' command functionally is ONLY included for pre-release builds, it is not
     // included in final production builds.  This is how Bitcoin is released, there is NO 'sendalert' command function

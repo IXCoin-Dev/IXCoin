@@ -628,7 +628,7 @@ Value submitblock(const Array& params, bool fHelp)
     return Value::null;
 }
 
-// The following are Ixcoin specific functions for a merged mined coin.
+// The following are IXCoin specific functions for a merged mined coin.
 
 Value getworkaux(const Array& params, bool fHelp)
 {
