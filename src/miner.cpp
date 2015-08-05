@@ -120,6 +120,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
+    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -331,7 +332,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         UpdateTime(*pblock, pindexPrev);
         pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock);
         pblock->nNonce         = 0;
-        pblock->vtx[0].vin[0].scriptSig = CScript() << OP_0 << OP_0;
+        pblock->vtx[0].vin[0].scriptSig = CScript() << pindexPrev->nHeight+1 << OP_0;
+        if (pblock->vtx[0].vout[0].nValue == 0) pblock->vtx[0].vout[0].scriptPubKey = CScript() << OP_RETURN;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
 
         CBlockIndex indexDummy(*pblock);

@@ -633,7 +633,7 @@ Value submitblock(const Array& params, bool fHelp)
 Value getworkaux(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() < 1)
-		throw runtime_error(
+        throw runtime_error(
             "getworkaux <aux>\n"
             "getworkaux '' <data>\n"
             "getworkaux 'submit' <data>\n"
@@ -674,7 +674,7 @@ Value getworkaux(const Array& params, bool fHelp)
         static int64_t nStart;
         static CBlockTemplate* pblocktemplate;
         if (pindexPrev != chainActive.Tip() ||
-			 vchAux != vchAuxPrev ||
+            vchAux != vchAuxPrev ||
             (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60))
         {
             if (pindexPrev != chainActive.Tip())
@@ -692,7 +692,7 @@ Value getworkaux(const Array& params, bool fHelp)
             // Store the pindexBest used before CreateNewBlock, to avoid races
             nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
             CBlockIndex* pindexPrevNew = chainActive.Tip();
-			vchAuxPrev = vchAux;
+            vchAuxPrev = vchAux;
             nStart = GetTime();
 
             // Create new block
@@ -750,7 +750,7 @@ Value getworkaux(const Array& params, bool fHelp)
         if (!mapNewBlock.count(pdata->hashMerkleRoot))
             return false;
         CBlock* pblock = mapNewBlock[pdata->hashMerkleRoot].first;
-		unsigned int nExtraNonce = mapNewBlock[pdata->hashMerkleRoot].second;
+        unsigned int nExtraNonce = mapNewBlock[pdata->hashMerkleRoot].second;
 
         pblock->nTime = pdata->nTime;
         pblock->nNonce = pdata->nNonce;
@@ -816,11 +816,31 @@ Value getauxblock(const Array& params, bool fHelp)
 {
     if (fHelp || (params.size() != 0 && params.size() != 2))
         throw runtime_error(
-            "getauxblock [<hash> <auxpow>]\n"
-            " create a new block"
-            "If <hash>, <auxpow> is not specified, returns a new block hash.\n"
-            "If <hash>, <auxpow> is specified, tries to solve the block based on "
-            "the aux proof of work and returns true if it was successful.");
+            "getauxblock (hash auxpow)\n"
+            "\nCreate or submit a merge-mined block.\n"
+            "\nWithout arguments, create a new block and return information\n"
+            "required to merge-mine it.  With arguments, submit a solved\n"
+            "auxpow for a previously returned block.\n"
+            "\nArguments:\n"
+            "1. \"hash\"    (string, optional) hash of the block to submit\n"
+            "2. \"auxpow\"  (string, optional) serialised auxpow found\n"
+            "\nResult (without arguments):\n"
+            "{\n"
+            "  \"hash\"               (string) hash of the created block\n"
+            "  \"chainid\"            (numeric) chain ID for this block\n"
+            "  \"previousblockhash\"  (string) hash of the previous block\n"
+            "  \"coinbasevalue\"      (numeric) value of the block's coinbase\n"
+            "  \"bits\"               (string) compressed target of the block\n"
+            "  \"height\"             (numeric) height of the block\n"
+            "  \"_target\"            (string) target in reversed byte order, deprecated\n"
+            "}\n"
+            "\nResult (with arguments):\n"
+            "xxxxx        (boolean) whether the submitted block was correct\n"
+            "\nExamples:\n"
+            + HelpExampleCli("getauxblock", "")
+            + HelpExampleCli("getauxblock", "\"hash\" \"serialised auxpow\"")
+            + HelpExampleRpc("getauxblock", "")
+            );
     if (vNodes.empty())
         throw JSONRPCError(RPC_CLIENT_NOT_CONNECTED, "IXCoin is not connected!");
 
@@ -835,9 +855,9 @@ Value getauxblock(const Array& params, bool fHelp)
         static unsigned int nTransactionsUpdatedLast;
         static CBlockIndex* pindexPrev;
         static int64_t nStart;
-		static CBlock* pblock;
+        static CBlock* pblock;
         static CBlockTemplate* pblocktemplate;
-		if (pindexPrev != chainActive.Tip() ||
+        if (pindexPrev != chainActive.Tip() ||
             (mempool.GetTransactionsUpdated() != nTransactionsUpdatedLast && GetTime() - nStart > 60))
         {
             if (pindexPrev != chainActive.Tip())
@@ -848,7 +868,7 @@ Value getauxblock(const Array& params, bool fHelp)
                     delete pblocktemplate;
                 vNewBlockTemplate.clear();
             }
-			// Clear pindexPrev so future getworks make a new block, despite any failures from here on
+            // Clear pindexPrev so future getworks make a new block, despite any failures from here on
             pindexPrev = NULL;
             // Store the pindexBest used before CreateNewBlock, to avoid races
             nTransactionsUpdatedLast = mempool.GetTransactionsUpdated();
@@ -860,19 +880,19 @@ Value getauxblock(const Array& params, bool fHelp)
             if (!pblocktemplate)
                 throw JSONRPCError(RPC_OUT_OF_MEMORY, "Out of memory");
 
-			pblock = &pblocktemplate->block;
+            pblock = &pblocktemplate->block;
+            // Need to update only after we know CreateNewBlock succeeded
+            pindexPrev = pindexPrevNew;
             // Update nTime
             UpdateTime(*pblock, pindexPrev);
             pblock->nNonce = 0;
-			// Need to update only after we know CreateNewBlock succeeded
-            pindexPrev = pindexPrevNew;
             // Push OP_2 just in case we want versioning later
             // FIXME: Debugging 9.3 upgrade build problem, commenting out this line fixed it (GR)
             // the problem is related to use of CBigNum, they are no longer referenced in script objects
             //pblock->vtx[0].vin[0].scriptSig = CScript() << pblock->nBits << CBigNum(1) << OP_2;
 
             pblock->hashMerkleRoot = pblock->BuildMerkleTree();
-			CAuxPow *blockAuxPow = new CAuxPow();
+            CAuxPow *blockAuxPow = new CAuxPow();
             // Sets the version
             pblock->SetAuxPow(blockAuxPow);
 
@@ -882,11 +902,15 @@ Value getauxblock(const Array& params, bool fHelp)
             vNewBlockTemplate.push_back(pblocktemplate);
 
         }
-        uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
         Object result;
-        result.push_back(Pair("target",   HexStr(BEGIN(hashTarget), END(hashTarget))));
         result.push_back(Pair("hash", pblock->GetHash().GetHex()));
+        result.push_back(Pair("previousblockhash", pblock->hashPrevBlock.GetHex()));
+        result.push_back(Pair("height", pindexPrev->nHeight + 1));
+        result.push_back(Pair("bits", HexBits(pblock->nBits)));
+        result.push_back(Pair("coinbasevalue", (int64_t)pblock->vtx[0].vout[0].nValue));
         result.push_back(Pair("chainid", pblock->GetChainID()));
+        uint256 hashTarget = CBigNum().SetCompact(pblock->nBits).getuint256();
+        result.push_back(Pair("_target", HexStr(BEGIN(hashTarget), END(hashTarget)))); // deprecated
         return result;
     }
     else
