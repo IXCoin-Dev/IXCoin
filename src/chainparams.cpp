@@ -1,6 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin Core developers
-// Copyright (c) 2011-2014 The Ixcoin Core developers
+// Copyright (c) 2011-2014 The IXCoin Core developers
 
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -41,14 +41,14 @@ public:
         // The message start string is designed to be unlikely to occur in normal data.
         // The characters are rarely used upper ASCII, not valid as UTF-8, and produce
         // a large 4-byte int at any alignment.
-        // They are the same 4 bytes used in previous Ixcoin 0.3.24 and 0.8.6 versions
+        // They are the same 4 bytes used in previous IXCoin 0.3.24 and 0.8.6 versions
         // MessageStart values from before 9/1/2011 were the same as Bitcoin, and are no longer needed between nodes to communicate.
         pchMessageStart[0] = 0xf1;
         pchMessageStart[1] = 0xba;
         pchMessageStart[2] = 0xb6;
         pchMessageStart[3] = 0xdb;
         //
-        // Starting with Ixcoin v0.9.2.1, the following vAlertPubKey ECDSA (Ecliptical Curve DSA) hex value will be used
+        // Starting with IXCoin v0.9.2.1, the following vAlertPubKey ECDSA (Ecliptical Curve DSA) hex value will be used
         // The private key is not publicly available. This allows only a small group to generate Alert messages on the IXCoin Network:  
         // As of 10/10/2014  Holders of the private key are: AhmedBodi, GroundRod & Cinnamon_Carter representing the IXCoin Foundation.
         // If an alert is necessary or desired, it can be used to inform all nodes of an important chain development or software upgrade
@@ -130,13 +130,13 @@ static CMainParams mainParams;
 
 
 //
-// Testnet (v1) for Ixcoin
+// Testnet (v1) for IXCoin
 //
 class CTestNetParams : public CMainParams {
 public:
     CTestNetParams() {
         // The message start string is designed to be unlikely to occur in normal data.
-        // They are the same 4 bytes that were used in previous Ixcoin 0.3.24 and 0.8.6 versions
+        // They are the same 4 bytes that were used in previous IXCoin 0.3.24 and 0.8.6 versions
         pchMessageStart[0] = 0xfa;
         pchMessageStart[1] = 0xbf;
         pchMessageStart[2] = 0xb6;
@@ -146,8 +146,8 @@ public:
         // Use this Private key for testnet 'sendalert' commands
         // "308201130201010420792aeda8e312f4e1b26861e3d16a19cd01b45c5531c1d90a9d180335a28d3bc0a081a53081a2020101302c06072a8648ce3d0101022100fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f300604010004010704410479be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8022100fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141020101a14403420004de6b00e3294afc25e03eead3fdb7b0dc9ebdf972625e40d79df84766c96a6ddfe8ae702c71f073ffa74fe69effd61ff7b27e8ceae2ac780cc786c278b270cffc"
         
-        nDefaultPort = 18337;                           // Same port as previous Ixcoin versions
-        nRPCPort = 18336;
+        nDefaultPort = 18337;                           // Same port as previous IXCoin versions
+        nRPCPort = 18338;
         strDataDir = "testnet";
         bnProofOfWorkLimit = CBigNum(~uint256(0) >> 30);
         nSubsidyHalvingInterval = 210000;

@@ -488,7 +488,7 @@ bool ConnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, C
 // Add this block to the block index, and if necessary, switch the active block chain to this
 bool AddToBlockIndex(CBlock& block, CValidationState& state, const CDiskBlockPos& pos);
 
-// Context-independent validity checks, however in Devcoin
+// Context-independent validity checks, however in IXCoin
 //  nHeight is needed to see if merged mining is allowed.
 //  Merged mining is introduced in block 160000.
 bool CheckBlock(const CBlock &block, CValidationState &state, int nHeight, bool fCheckPOW=true, bool fCheckMerkleRoot=true);

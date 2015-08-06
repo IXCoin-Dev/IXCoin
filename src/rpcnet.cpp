@@ -418,7 +418,7 @@ Value getnetworkinfo(const Array& params, bool fHelp)
 // Only build this code in preleases or test builds
 #if CLIENT_VERSION_IS_RELEASE != true
 //
-// This allows our developers and foundation to notify all nodes of any issues on the Ixcoin network
+// This allows our developers and foundation to notify all nodes of any issues on the IXCoin network
 //
 Value sendalert(const Array& params, bool fHelp)
 {
@@ -513,7 +513,7 @@ Value sendalert(const Array& params, bool fHelp)
         BOOST_FOREACH(CNode* pnode, vNodes)
             alert.RelayTo(pnode);
     }
-    // At this point, the Ixcoin network will be flooded with the alert message before very much time has passed.
+    // At this point, the IXCoin network will be flooded with the alert message before very much time has passed.
 
     Object res;
     res.push_back( Pair("AlertID", alert.nID) );

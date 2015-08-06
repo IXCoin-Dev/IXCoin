@@ -120,6 +120,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
     txNew.vout.resize(1);
+    txNew.vout[0].scriptPubKey = scriptPubKeyIn;
 
     // Add our coinbase tx as first transaction
     pblock->vtx.push_back(txNew);
@@ -331,7 +332,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn)
         UpdateTime(*pblock, pindexPrev);
         pblock->nBits          = GetNextWorkRequired(pindexPrev, pblock);
         pblock->nNonce         = 0;
-        pblock->vtx[0].vin[0].scriptSig = CScript() << OP_0 << OP_0;
+        pblock->vtx[0].vin[0].scriptSig = CScript() << pindexPrev->nHeight+1 << OP_0;
+        if (pblock->vtx[0].vout[0].nValue == 0) pblock->vtx[0].vout[0].scriptPubKey = CScript() << OP_RETURN;
         pblocktemplate->vTxSigOps[0] = GetLegacySigOpCount(pblock->vtx[0]);
 
         CBlockIndex indexDummy(*pblock);
@@ -477,7 +479,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
             return error("AUX POW parent hash %s is not under target %s", auxpow->GetParentBlockHash().GetHex().c_str(), hashTarget.GetHex().c_str());
 
         //// debug print
-        printf("DevcoinMiner:\n");
+        printf("IXCoinMiner:\n");
         printf("AUX proof-of-work found  \n     our hash: %s   \n  parent hash: %s  \n       target: %s\n",
                 hash.GetHex().c_str(),
                 auxpow->GetParentBlockHash().GetHex().c_str(),
@@ -489,7 +491,7 @@ bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 			return false;
 
 		//// debug print
-		LogPrintf("DevcoinMiner:\n");
+		LogPrintf("IXCoinMiner:\n");
 		LogPrintf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex(), hashTarget.GetHex());
 	}
     pblock->print();
