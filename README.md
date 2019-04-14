@@ -2,7 +2,7 @@ IXCoin Core integration/staging tree
 =====================================
 
 Copyright (c) 2009-2016 Bitcoin Core Developers
-Copyright (c) 2011-2016 IXCoin Core Developers
+Copyright (c) 2011-2019 A Ixcoin Core Developers Project
 
 What is IXCoin?
 ----------------
