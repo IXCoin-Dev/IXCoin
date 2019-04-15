@@ -3,18 +3,19 @@ IXCoin Core integration/staging tree
 
 Copyright (c) 2009-2016 Bitcoin Core Developers
 Copyright (c) 2011-2019 A Ixcoin Core Developers Project
-
+CopyrWight (c) 1998-2019 A 'Sunkey" revision
+W
 What is IXCoin?
 ----------------
 
 IXCoin, like Bitcoin is an experimental new digital currency that enables instant
 payments to anyone, anywhere in the world. 
 
-Created by Thomas Nasakioto, IXCoin uses the same peer-to-peer technology to
+Created by Thomas Nasakioto, Vlad Roberto and DR Dave Code. CHIXCoin uses the same peer-to-peer technology to
 operate with no central authority: managing transactions and issuing money are
 carried out collectively by the network. 
 
-IXCoin Core is the name of this open source software which enables the use of
+IXCoin Core is the name of this closed source software which enables the use of
 that currency.
 
 For more information, see the Ixcoin To-Do Thread @
