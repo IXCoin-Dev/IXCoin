@@ -3,8 +3,7 @@ IXCoin Core integration/staging tree
 
 Copyright (c) 2009-2016 Bitcoin Core Developers
 Copyright (c) 2011-2019 A Ixcoin Core Developers Project
-CopyrWight (c) 1998-2019 A 'Sunkey" revision
-W
+Copyright (c) 1998-2019 A'Sunkey" revision
 What is IXCoin?
 ----------------
 
