@@ -1,4 +1,4 @@
-IXCoin Core integration/staging tree
+IXCoin Core Integration/staging tree
 =====================================
 
 Copyright (c) 2009-2016 Bitcoin Core Developers
@@ -8,10 +8,11 @@ Copyright (c) 1998-2019 A 'Sunkey" revision Project
 What is IXCoin?
 ----------------
 
-IXCoin, like Bitcoin is an experimental new digital currency that enables instant
-payments to anyone, anywhere in the world. 
+IXCoin, like Bitcoin is a digital currency that enables instant
+payments to anyone, anywhere in the world. With the inclusion and development of a recent tense, this is an 
+add of a 'Streaming Currency' where peers can gain an income through the meta-nets flowing source. 
 
-Created by Thomas Nasakioto, Vlad Roberto and DR Dave Code. CHIXCoin uses the same peer-to-peer technology to
+Created by Thomas Nasakioto, Vlad Roberto and DR Dave Code. IXCoin uses the same peer-to-peer technology to
 operate with no central authority: managing transactions and issuing money are
 carried out collectively by the network. 
 
@@ -21,8 +22,8 @@ that currency.
 For more information, see the Ixcoin To-Do Thread @
 https://bitcointalk.org/index.php?topic=230141
 
-A new IXcoin Foundation has recently formed in 2014, this is ongoing, with the
-intention that the orignal http://www.ixcoin.org website be maintained and
+A IXcoin Foundation has formed in 2014, this is ongoing, With the
+intention to the orignal http://www.ixcoin.org website to be maintained and
 kept current, watch there for updates as well as useable binary versions of
 the IXCoin Core software
 
@@ -31,8 +32,11 @@ License
 
 IXCoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see http://opensource.org/licenses/MIT.
+IXcoin is under a developmental revision and intergration with Sunkey INC; (C) Copyright 2019. 
+Under licence of IXcoin World Wide (C) 2011-2019.
 
-Development process
+
+Development Process
 -------------------
 
 Developers work in their own trees, then submit pull requests when they think
